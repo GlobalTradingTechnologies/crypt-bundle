@@ -1,0 +1,26 @@
+{
+    "name": "gtt/crypt-bundle",
+    "description": "Provides symfony services for encryptor/decryptor services based on various cryptographic components",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "fduch",
+            "email": "alex.medwedew@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/framework-bundle": " ~2.3"
+    },
+    "suggest": {
+        "zendframework/zend-crypt": "required in case when zend-crypt cryptographic component is used"
+    },
+    "autoload": {
+        "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    }
+}

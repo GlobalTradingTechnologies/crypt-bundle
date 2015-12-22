@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="gtt.crypt.rsa.factory" class="Zend\Crypt\PublicKey\Rsa"/>
+        
+        <service id="gtt.crypt.rsa.zend_rsa" class="Zend\Crypt\PublicKey\Rsa" public="false" abstract="true">
+            <factory service="gtt.crypt.rsa.factory" method="factory" />
+            <argument type="collection" /> <!-- Rsa options -->
+        </service>
+
+        <service id="gtt.crypt.rsa.encryptor" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaEncryptor" abstract="true">
+            <argument /> <!-- Concrete zend rsa implementation -->
+        </service>
+
+        <service id="gtt.crypt.rsa.decryptor" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaDecryptor" abstract="true">
+            <argument /> <!-- Concrete zend rsa implementation -->
+        </service>
+
+    </services>
+</container>
