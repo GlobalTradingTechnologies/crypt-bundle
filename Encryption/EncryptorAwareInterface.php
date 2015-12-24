@@ -22,8 +22,9 @@ interface EncryptorAwareInterface
     /**
      * Sets encryptor
      *
-     * @param string             $name      unique name of the encryptor set in bundle config
      * @param EncryptorInterface $encryptor encryptor
+     * @param string             $name      unique name of the encryptor set in bundle config used to separate
+     *                                      encryptors in case when encryptor aware service requires several encryptors
      */
-    public function setEncryptor($name, EncryptorInterface $encryptor);
+    public function setEncryptor(EncryptorInterface $encryptor, $name);
 }

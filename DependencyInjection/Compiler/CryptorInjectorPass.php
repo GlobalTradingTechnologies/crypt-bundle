@@ -83,7 +83,7 @@ class CryptorInjectorPass implements CompilerPassInterface
                         );
                     }
 
-                    $targetDefinition->addMethodCall($tagConfig['setter'], array($name, new Reference($cryptorId)));
+                    $targetDefinition->addMethodCall($tagConfig['setter'], array(new Reference($cryptorId), $name));
                 }
             }
         }

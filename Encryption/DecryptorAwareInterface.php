@@ -22,8 +22,9 @@ interface DecryptorAwareInterface
     /**
      * Sets decryptor
      *
-     * @param string             $name      unique name of the decryptor set in bundle config
      * @param DecryptorInterface $decryptor decryptor
+     * @param string             $name      unique name of the decryptor set in bundle config used to separate
+     *                                      decryptors in case when decryptor aware service requires several decryptors
      */
-    public function setDecryptor($name, DecryptorInterface $decryptor);
+    public function setDecryptor(DecryptorInterface $decryptor, $name);
 }
