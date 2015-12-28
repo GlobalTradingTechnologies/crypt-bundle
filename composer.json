@@ -18,6 +18,9 @@
     "autoload": {
         "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "" }
     },
+    "autoload-dev": {
+        "psr-4": { "Gtt\\Bundle\\CryptBundle\\Tests\\": "Tests/" }
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "0.1.x-dev"
