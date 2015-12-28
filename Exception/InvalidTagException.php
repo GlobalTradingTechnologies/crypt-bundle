@@ -13,7 +13,7 @@
 namespace Gtt\Bundle\CryptBundle\Exception;
 
 /**
- * Exception for cases when DI tag is defined incorrectly
+ * Exception for cases when DI tag is adjusted incorrectly
  *
  * @author fduch <alex.medwedew@gmail.com>
  */
