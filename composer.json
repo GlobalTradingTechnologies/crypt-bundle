@@ -1,6 +1,6 @@
 {
     "name": "gtt/crypt-bundle",
-    "description": "Provides symfony services for encryptor/decryptor services based on various cryptographic components",
+    "description": "Provides symfony encryptor/decryptor services based on various cryptographic components",
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
