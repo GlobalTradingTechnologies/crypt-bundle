@@ -2,6 +2,7 @@ CryptBundle
 ===========
 
 [![Build Status](https://travis-ci.org/GlobalTradingTechnologies/crypt-bundle.svg?branch=master)](https://travis-ci.org/GlobalTradingTechnologies/crypt-bundle)
+[![Latest Stable Version](https://poser.pugx.org/gtt/crypt-bundle/version)](https://packagist.org/packages/gtt/crypt-bundle)
 [![Latest Unstable Version](https://poser.pugx.org/gtt/crypt-bundle/v/unstable)](//packagist.org/packages/gtt/crypt-bundle)
 [![License](https://poser.pugx.org/gtt/crypt-bundle/license)](https://packagist.org/packages/gtt/crypt-bundle)
 
