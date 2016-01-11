@@ -32,7 +32,7 @@ class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Gtt\Bundle\CryptBundle\Exception\CryptorNotFoundException
+     * @expectedException \Gtt\Bundle\CryptBundle\Exception\CryptorDefinitionNotFoundException
      */
     public function testWrongCryptorNameLeadsToException()
     {

@@ -13,7 +13,7 @@
 namespace Gtt\Bundle\CryptBundle\DependencyInjection\Compiler;
 
 use Gtt\Bundle\CryptBundle\DependencyInjection\GttCryptExtension;
-use Gtt\Bundle\CryptBundle\Exception\CryptorNotFoundException;
+use Gtt\Bundle\CryptBundle\Exception\CryptorDefinitionNotFoundException;
 use Gtt\Bundle\CryptBundle\Exception\InvalidConsumerClassException;
 use Gtt\Bundle\CryptBundle\Exception\InvalidTagException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -44,14 +44,14 @@ class CryptorInjectorPass implements CompilerPassInterface
      */
     private static $tagConfig = array(
         self::ENCRYPTOR_AWARE_TAG => array(
-            'target_interface' => 'Gtt\Bundle\CryptBundle\Encryption\EncryptorAwareInterface',
-            'setter'           => 'setEncryptor',
-            'cryptor_pattern'  => GttCryptExtension::ENCRYPTOR_PATTERN
+            'target_interface'     => 'Gtt\Bundle\CryptBundle\Encryption\EncryptorAwareInterface',
+            'setter'               => 'setEncryptor',
+            'service_id_generator' => array('Gtt\Bundle\CryptBundle\DependencyInjection\CryptorServiceIdGenerator', 'generateEncryptorId')
         ),
         self::DECRYPTOR_AWARE_TAG => array(
-            'target_interface' => 'Gtt\Bundle\CryptBundle\Encryption\DecryptorAwareInterface',
-            'setter'           => 'setDecryptor',
-            'cryptor_pattern'  => GttCryptExtension::DECRYPTOR_PATTERN
+            'target_interface'     => 'Gtt\Bundle\CryptBundle\Encryption\DecryptorAwareInterface',
+            'setter'               => 'setDecryptor',
+            'service_id_generator' => array('Gtt\Bundle\CryptBundle\DependencyInjection\CryptorServiceIdGenerator', 'generateDecryptorId')
         )
     );
 
@@ -70,9 +70,9 @@ class CryptorInjectorPass implements CompilerPassInterface
                     }
                     $name = $container->getParameterBag()->resolveValue($tag['cryptor_name']);
 
-                    $cryptorId = str_replace("<name>", $name, $tagConfig['cryptor_pattern']);
+                    $cryptorId = call_user_func_array($tagConfig['service_id_generator'], array($name));
                     if (!$container->hasDefinition($cryptorId)) {
-                        throw new CryptorNotFoundException($id, $name);
+                        throw new CryptorDefinitionNotFoundException($id, $name);
                     }
 
                     $targetDefinition      = $container->getDefinition($id);

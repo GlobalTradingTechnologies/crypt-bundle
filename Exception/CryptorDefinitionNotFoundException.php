@@ -16,7 +16,7 @@ namespace Gtt\Bundle\CryptBundle\Exception;
  *
  * @author fduch
  */
-class CryptorNotFoundException extends InvalidTagException
+class CryptorDefinitionNotFoundException extends InvalidTagException
 {
     /**
      * CryptorNotFoundException constructor.
@@ -26,6 +26,6 @@ class CryptorNotFoundException extends InvalidTagException
      */
     public function __construct($consumerServiceId, $name)
     {
-        parent::__construct(sprintf("Cannot find cryptor for service '%s' by name '%s'", $consumerServiceId, $name));
+        parent::__construct(sprintf("Cannot find cryptor definition for service '%s' by name '%s'", $consumerServiceId, $name));
     }
 }
