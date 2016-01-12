@@ -12,11 +12,11 @@
             <argument type="collection" /> <!-- Rsa options -->
         </service>
 
-        <service id="gtt.crypt.rsa.encryptor" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaEncryptor" abstract="true">
+        <service id="gtt.crypt.rsa.encryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaEncryptor" abstract="true">
             <argument /> <!-- Concrete zend rsa implementation -->
         </service>
 
-        <service id="gtt.crypt.rsa.decryptor" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaDecryptor" abstract="true">
+        <service id="gtt.crypt.rsa.decryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaDecryptor" abstract="true">
             <argument /> <!-- Concrete zend rsa implementation -->
         </service>
 
