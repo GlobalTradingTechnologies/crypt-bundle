@@ -66,6 +66,9 @@ class GttCryptExtension extends Extension
             case 'rsa':
                 $this->registerRsaCryptor($name, $cryptorConfig, $registryDefinition, $container);
                 break;
+            case 'symmetric':
+                $this->registerSymmetricCryptor($name, $cryptorConfig, $registryDefinition, $container);
+                break;
             default:
                 throw new InvalidConfigurationException(sprintf('The cryptor type "%s" is not support', $type));
         }
@@ -95,15 +98,72 @@ class GttCryptExtension extends Extension
         $rsaDecryptorDefinition = new DefinitionDecorator('gtt.crypt.rsa.decryptor');
         $rsaDecryptorDefinition->replaceArgument(0, $zendRsaReference);
 
-        $rsaEncryptorDefinitionId = CryptorServiceIdGenerator::generateEncryptorId($name);
-        $rsaDecryptorDefinitionId = CryptorServiceIdGenerator::generateDecryptorId($name);
+        $this->setCryptorsPair(
+            $name,
+            $container,
+            $registryDefinition,
+            $rsaEncryptorDefinition,
+            $rsaDecryptorDefinition
+        );
+    }
+
+    /**
+     * Register the symmetric cryptors in container
+     *
+     * @param string           $name                cryptor name
+     * @param array            $cryptorConfig       cryptor config
+     * @param Definition       $registryDefinition  registry service definition
+     * @param ContainerBuilder $container           container
+     */
+    protected function registerSymmetricCryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
+    {
+        $keyReaderDefinition = new DefinitionDecorator('gtt.crypt.symmetric.key_reader');
+        $keyReaderDefinition->replaceArgument(0, $cryptorConfig['path']);
+        $keyReaderDefinition->setPublic(false);
+        $keyReaderDefinitionId = "gtt.crypt.symmetric.key_reader.$name";
+        $container->setDefinition($keyReaderDefinitionId, $keyReaderDefinition);
+        $keyReaderReference = new Reference($keyReaderDefinitionId);
+
+        $symmetricEncryptorDefinition = new DefinitionDecorator('gtt.crypt.symmetric.encryptor');
+        $symmetricEncryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
+
+        $symmetricDecryptorDefinition = new DefinitionDecorator('gtt.crypt.symmetric.decryptor');
+        $symmetricDecryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
+
+        $this->setCryptorsPair(
+            $name,
+            $container,
+            $registryDefinition,
+            $symmetricEncryptorDefinition,
+            $symmetricDecryptorDefinition
+        );
+    }
+
+    /**
+     * Add encryptor and decryptor definitions to container and cryptor registry
+     *
+     * @param string           $name                Cryptor name
+     * @param ContainerBuilder $container           Container
+     * @param Definition       $registryDefinition  Registry definition
+     * @param Definition       $encryptorDefinition Encryptor definition
+     * @param Definition       $decryptorDefinition Decryptor definition
+     */
+    private function setCryptorsPair(
+        $name,
+        ContainerBuilder $container,
+        Definition $registryDefinition,
+        Definition $encryptorDefinition,
+        Definition $decryptorDefinition)
+    {
+        $encryptorDefinitionId = CryptorServiceIdGenerator::generateEncryptorId($name);
+        $decryptorDefinitionId = CryptorServiceIdGenerator::generateDecryptorId($name);
 
         $container->addDefinitions(array(
-            $rsaEncryptorDefinitionId => $rsaEncryptorDefinition,
-            $rsaDecryptorDefinitionId => $rsaDecryptorDefinition
+            $encryptorDefinitionId => $encryptorDefinition,
+            $decryptorDefinitionId => $decryptorDefinition,
         ));
 
-        $registryDefinition->addMethodCall('addEncryptor', array($name, new Reference($rsaEncryptorDefinitionId)));
-        $registryDefinition->addMethodCall('addDecryptor', array($name, new Reference($rsaDecryptorDefinitionId)));
+        $registryDefinition->addMethodCall('addEncryptor', array($name, new Reference($encryptorDefinitionId)));
+        $registryDefinition->addMethodCall('addDecryptor', array($name, new Reference($decryptorDefinitionId)));
     }
 }

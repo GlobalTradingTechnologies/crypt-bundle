@@ -45,7 +45,7 @@ class Configuration implements ConfigurationInterface
                                 foreach ($typedCryptors as $name => $cryptorConfig) {
                                     if (in_array($name, $usedNames)) {
                                         throw new InvalidConfigurationException(
-                                            sprintf("Cryptor names should be unique. '%s' name is duplicated"), $name);
+                                            sprintf("Cryptor names should be unique. '%s' name is duplicated", $name));
                                     } else {
                                         $usedNames[] = $name;
                                     }
@@ -64,6 +64,17 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('public_key')->end()
                                     ->scalarNode('binary_output')->defaultTrue()->end()
                                     ->scalarNode('hash_algorithm')->defaultValue('sha1')->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->children()
+                        ->arrayNode('symmetric')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('path')->isRequired()->end()
+                                    ->booleanNode('base64')->isRequired()->defaultTrue()->end()
                                 ->end()
                             ->end()
                         ->end()

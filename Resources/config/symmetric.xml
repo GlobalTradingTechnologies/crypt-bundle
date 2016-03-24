@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="gtt.crypt.symmetric.key_reader" class="Zend\Crypt\PublicKey\Rsa" public="false" abstract="true">
+            <argument/> <!-- Path o a key file -->
+        </service>
+
+        <service id="gtt.crypt.symmetric.encryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Symmetric\SymmetricEncryptor" abstract="true">
+            <argument/> <!-- Concrete key reader -->
+            <argument/> <!-- Apply base64 -->
+        </service>
+
+        <service id="gtt.crypt.symmetric.decryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Symmetric\SymmetricDecryptor" abstract="true">
+            <argument/> <!-- Concrete key reader -->
+            <argument/> <!-- Apply base64 -->
+        </service>
+
+    </services>
+</container>
