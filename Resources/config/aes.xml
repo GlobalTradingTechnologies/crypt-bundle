@@ -6,18 +6,18 @@
 
     <services>
 
-        <service id="gtt.crypt.aes128.key_reader" class="Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader" public="false" abstract="true">
+        <service id="gtt.crypt.aes.key_reader" class="Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader" public="false" abstract="true">
             <argument/> <!-- Path o a key file -->
         </service>
 
-        <service id="gtt.crypt.aes128.encryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Encryptor" abstract="true">
+        <service id="gtt.crypt.aes.encryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Aes\AesEncryptor" abstract="true">
             <argument/> <!-- Concrete key reader -->
-            <argument/> <!-- Apply base64 -->
+            <argument/> <!-- Ciphertext is a binary -->
         </service>
 
-        <service id="gtt.crypt.aes128.decryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Decryptor" abstract="true">
+        <service id="gtt.crypt.aes.decryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Aes\AesDecryptor" abstract="true">
             <argument/> <!-- Concrete key reader -->
-            <argument/> <!-- Apply base64 -->
+            <argument/> <!-- Ciphertext is a binary -->
         </service>
 
     </services>

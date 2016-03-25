@@ -66,8 +66,8 @@ class GttCryptExtension extends Extension
             case 'rsa':
                 $this->registerRsaCryptor($name, $cryptorConfig, $registryDefinition, $container);
                 break;
-            case 'aes128':
-                $this->registerAes128Cryptor($name, $cryptorConfig, $registryDefinition, $container);
+            case 'aes':
+                $this->registerAesCryptor($name, $cryptorConfig, $registryDefinition, $container);
                 break;
             default:
                 throw new InvalidConfigurationException(sprintf('The cryptor type "%s" is not support', $type));
@@ -115,23 +115,23 @@ class GttCryptExtension extends Extension
      * @param Definition       $registryDefinition  registry service definition
      * @param ContainerBuilder $container           container
      */
-    protected function registerAes128Cryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
+    protected function registerAesCryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
     {
-        $keyReaderDefinition = new DefinitionDecorator('gtt.crypt.aes128.key_reader');
+        $keyReaderDefinition = new DefinitionDecorator('gtt.crypt.aes.key_reader');
         if (!is_readable($cryptorConfig['key_path'])) {
             throw new InvalidConfigurationException(sprintf('Unable to read key file %s', $cryptorConfig['key_path']));
         }
         $keyReaderDefinition->replaceArgument(0, $cryptorConfig['key_path']);
         $keyReaderDefinition->setPublic(false);
-        $keyReaderDefinitionId = "gtt.crypt.aes128.key_reader.$name";
+        $keyReaderDefinitionId = "gtt.crypt.aes.key_reader.$name";
         $container->setDefinition($keyReaderDefinitionId, $keyReaderDefinition);
         $keyReaderReference = new Reference($keyReaderDefinitionId);
 
-        $aesEncryptorDefinition = new DefinitionDecorator('gtt.crypt.aes128.encryptor');
-        $aesEncryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
+        $aesEncryptorDefinition = new DefinitionDecorator('gtt.crypt.aes.encryptor');
+        $aesEncryptorDefinition->setArguments([$keyReaderReference, $cryptorConfig['binary_output']]);
 
-        $aesDecryptorDefinition = new DefinitionDecorator('gtt.crypt.aes128.decryptor');
-        $aesDecryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
+        $aesDecryptorDefinition = new DefinitionDecorator('gtt.crypt.aes.decryptor');
+        $aesDecryptorDefinition->setArguments([$keyReaderReference, $cryptorConfig['binary_output']]);
 
         $this->setCryptorsPair(
             $name,
@@ -161,12 +161,12 @@ class GttCryptExtension extends Extension
         $encryptorDefinitionId = CryptorServiceIdGenerator::generateEncryptorId($name);
         $decryptorDefinitionId = CryptorServiceIdGenerator::generateDecryptorId($name);
 
-        $container->addDefinitions(array(
+        $container->addDefinitions([
             $encryptorDefinitionId => $encryptorDefinition,
             $decryptorDefinitionId => $decryptorDefinition,
-        ));
+        ]);
 
-        $registryDefinition->addMethodCall('addEncryptor', array($name, new Reference($encryptorDefinitionId)));
-        $registryDefinition->addMethodCall('addDecryptor', array($name, new Reference($decryptorDefinitionId)));
+        $registryDefinition->addMethodCall('addEncryptor', [$name, new Reference($encryptorDefinitionId)]);
+        $registryDefinition->addMethodCall('addDecryptor', [$name, new Reference($decryptorDefinitionId)]);
     }
 }

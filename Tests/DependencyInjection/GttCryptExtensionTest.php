@@ -9,9 +9,11 @@
 
 namespace Gtt\Bundle\CryptBundle\Tests\DependencyInjection;
 
+use Gtt\Bundle\CryptBundle\Tests\Bridge\Aes\Fixtures;
 use PHPUnit_Framework_TestCase as TestCase;
 use Gtt\Bundle\CryptBundle\DependencyInjection\GttCryptExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Crypto;
 
 /**
  * "Integration-level" test: instead of use mocks it checks the original
@@ -40,7 +42,7 @@ class GttCryptExtensionTest extends TestCase
     protected function tearDown()
     {
         if (file_exists($this->existentKeyFile)) {
-            unset($this->existentKeyFile);
+            unlink($this->existentKeyFile);
         }
     }
 
@@ -49,34 +51,42 @@ class GttCryptExtensionTest extends TestCase
      */
     public function testLoadAll()
     {
-        $config = array(
-            'cryptors' => array(
-                'rsa' => array(
-                    'foo' => array(),
-                    'bar' => array(),
-                ),
-                'aes128' => array(
-                    'baz' => array('key_path' => $this->existentKeyFile, 'base64' => false),
-                    'qux' => array('key_path' => $this->existentKeyFile, 'base64' => true),
-                ),
-            ),
-        );
-        $this->load($config, function (TestCase $test, ContainerBuilder $container) use ($config) {
+        $config = [
+            'cryptors' => [
+                'rsa' => [
+                    'foo' => [],
+                    'bar' => [],
+                ],
+                'aes' => [
+                    'baz' => [
+                        'key_size'      => Fixtures::bits(),
+                        'key_path'      => $this->existentKeyFile,
+                        'binary_output' => true,
+                    ],
+                    'qux' => [
+                        'key_size'      => Fixtures::bits(),
+                        'key_path'      => $this->existentKeyFile,
+                        'binary_output' => false,
+                    ],
+                ],
+            ],
+        ];
+        $this->load($config, function (ContainerBuilder $container) use ($config) {
             foreach ($config['cryptors'] as $cryptorType) {
                 foreach ($cryptorType as $name => $cryptorConfig) {
                     $this->assertTrue($container->hasDefinition("gtt.crypt.encryptor.$name"));
                 }
             }
-            $test->assertTrue($container->has('gtt.crypt.rsa.zend_rsa.foo'));
-            $test->assertTrue($container->has('gtt.crypt.rsa.zend_rsa.bar'));
+            $this->assertTrue($container->has('gtt.crypt.rsa.zend_rsa.foo'));
+            $this->assertTrue($container->has('gtt.crypt.rsa.zend_rsa.bar'));
 
-            $test->assertTrue($container->has('gtt.crypt.aes128.key_reader.baz'));
-            $test->assertTrue($container->has('gtt.crypt.aes128.key_reader.qux'));
-            $test->assertEquals($this->existentKeyFile, $container->getDefinition('gtt.crypt.aes128.key_reader.baz')->getArgument(0));
-            $test->assertEquals($this->existentKeyFile, $container->getDefinition('gtt.crypt.aes128.key_reader.qux')->getArgument(0));
+            $this->assertTrue($container->has('gtt.crypt.aes.key_reader.baz'));
+            $this->assertTrue($container->has('gtt.crypt.aes.key_reader.qux'));
+            $this->assertEquals($this->existentKeyFile, $container->getDefinition('gtt.crypt.aes.key_reader.baz')->getArgument(0));
+            $this->assertEquals($this->existentKeyFile, $container->getDefinition('gtt.crypt.aes.key_reader.qux')->getArgument(0));
 
-            $this->assertFalse($container->getDefinition('gtt.crypt.encryptor.baz')->getArgument(1));
-            $this->assertTrue($container->getDefinition('gtt.crypt.encryptor.qux')->getArgument(1));
+            $this->assertTrue($container->getDefinition('gtt.crypt.encryptor.baz')->getArgument(1));
+            $this->assertFalse($container->getDefinition('gtt.crypt.encryptor.qux')->getArgument(1));
         });
     }
 
@@ -87,25 +97,74 @@ class GttCryptExtensionTest extends TestCase
      */
     public function provideInvalidConfiguration()
     {
-        return array(
-            array(
+        return [
+            [
                 "Cryptor names should be unique. 'foo' name is duplicated",
-                array(
-                    'cryptors' => array(
-                        'rsa'       => array('foo' => array()),
-                        'aes128' => array('foo' => array('key_path' => $this->existentKeyFile, 'base64' => false)),
-                    ),
-                ),
-            ),
-            array(
-                'The child node "key_path" at path "gtt_crypt.cryptors.aes128.foo" must be configured',
-                array('cryptors' => array('aes128' => array('foo' => array()))),
-            ),
-            array(
-                'The child node "base64" at path "gtt_crypt.cryptors.aes128.foo" must be configured',
-                array('cryptors' => array('aes128' => array('foo' => array('key_path' => $this->existentKeyFile)))),
-            ),
-        );
+                [
+                    'cryptors' => [
+                        'rsa' => ['foo' => []],
+                        'aes' => [
+                            'foo' => [
+                                'key_size' => Fixtures::bits(),
+                                'key_path' => $this->existentKeyFile,
+                                'binary_output' => true
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'The child node "key_size" at path "gtt_crypt.cryptors.aes.foo" must be configured',
+                [
+                    'cryptors' => [
+                        'rsa' => ['foo' => []],
+                        'aes' => [
+                            'foo' => []
+                        ],
+                    ],
+                ],
+            ],
+            [
+                sprintf('Installed version of defuse/php-encryption package provide only %d bits key size', Fixtures::bits()),
+                [
+                    'cryptors' => [
+                        'rsa' => ['foo' => []],
+                        'aes' => [
+                            'foo' => [
+                                'key_size' => 999,
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'The child node "key_path" at path "gtt_crypt.cryptors.aes.foo" must be configured',
+                [
+                    'cryptors' => [
+                        'rsa' => ['foo' => []],
+                        'aes' => [
+                            'foo' => [
+                                'key_size' => Fixtures::bits(),
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'The child node "binary_output" at path "gtt_crypt.cryptors.aes.foo" must be configured',
+                [
+                    'cryptors' => [
+                        'rsa' => ['foo' => []],
+                        'aes' => [
+                            'foo' => [
+                                'key_size' => Fixtures::bits(),
+                                'key_path' => $this->existentKeyFile,
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -128,18 +187,18 @@ class GttCryptExtensionTest extends TestCase
     /**
      * Common method to load extension
      *
-     * @param array         $config           The configuration
-     * @param callable|null $postLoadCallback Callback should be invoked on success load
+     * @param array         $config   The configuration
+     * @param callable|null $postLoad Callback should be invoked on success load
      */
-    private function load(array $config, $postLoadCallback = null)
+    private function load(array $config, callable $postLoad = null)
     {
         $extension = new GttCryptExtension();
         $container = new ContainerBuilder();
 
-        $extension->load(array($config), $container);
-        if (is_callable($postLoadCallback)) {
+        $extension->load([$config], $container);
+        if ($postLoad !== null) {
             $this->assertTrue($container->has('gtt.crypt.registry'));
-            $postLoadCallback($this, $container);
+            $postLoad($container);
         }
     }
 }

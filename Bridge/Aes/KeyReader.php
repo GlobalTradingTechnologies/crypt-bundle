@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Gtt\Bundle\CryptBundle\Bridge\Aes128;
+namespace Gtt\Bundle\CryptBundle\Bridge\Aes;
 
 use Gtt\Bundle\CryptBundle\Exception\KeyReaderException;
 use Crypto;

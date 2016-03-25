@@ -7,21 +7,16 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes128;
+namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader;
+use Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader;
 
 /**
  * Tests for key reader
  */
 class KeyReaderTest extends TestCase
 {
-    /**
-     * Valid encryption key
-     */
-    const TEST_KEY = '0123456789ABCDEF';
-
     /**
      * Path to a key file
      *
@@ -53,9 +48,9 @@ class KeyReaderTest extends TestCase
     public function testReadSuccess()
     {
         $extra = '123';
-        file_put_contents($this->filename, self::TEST_KEY . $extra, LOCK_EX);
+        file_put_contents($this->filename, Fixtures::key() . $extra, LOCK_EX);
         $subject = new KeyReader($this->filename);
-        $this->assertEquals(self::TEST_KEY, $subject->read());
+        $this->assertEquals(Fixtures::key(), $subject->read());
     }
 
     /**

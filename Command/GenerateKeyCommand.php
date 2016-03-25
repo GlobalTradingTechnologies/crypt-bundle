@@ -26,8 +26,8 @@ class GenerateKeyCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('crypt:aes128:generate-key')
-            ->setDescription('Generate a random encryption key')
+        $this->setName('crypt:aes:generate-key')
+            ->setDescription(sprintf('Generate a random encryption key of %d bytes', Crypto::KEY_BYTE_SIZE))
             ->addArgument('filename', InputArgument::REQUIRED);
     }
 

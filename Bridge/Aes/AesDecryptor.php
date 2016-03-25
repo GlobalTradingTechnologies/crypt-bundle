@@ -7,7 +7,7 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Bridge\Aes128;
+namespace Gtt\Bundle\CryptBundle\Bridge\Aes;
 
 use Gtt\Bundle\CryptBundle\Encryption\DecryptorInterface;
 use Gtt\Bundle\CryptBundle\Exception\SymmetricEncryptionException;
@@ -19,7 +19,7 @@ use CannotPerformOperationException;
 /**
  * Perform symmetric decryption of ciphertext
  */
-class Aes128Decryptor implements DecryptorInterface
+class AesDecryptor implements DecryptorInterface
 {
     /**
      * Key reader
@@ -33,18 +33,18 @@ class Aes128Decryptor implements DecryptorInterface
      *
      * @var bool
      */
-    private $base64;
+    private $binaryOutput;
 
     /**
      * Constructor
      *
-     * @param KeyReader $keyReader Key reader
-     * @param bool      $base64    Ciphertext should be Base64-encoded
+     * @param KeyReader $keyReader    Key reader
+     * @param bool      $binaryOutput Ciphertext should be raw binary
      */
-    public function __construct(KeyReader $keyReader, $base64)
+    public function __construct(KeyReader $keyReader, $binaryOutput)
     {
-        $this->keyReader = $keyReader;
-        $this->base64    = $base64;
+        $this->keyReader    = $keyReader;
+        $this->binaryOutput = $binaryOutput;
     }
 
     /**
@@ -53,7 +53,7 @@ class Aes128Decryptor implements DecryptorInterface
     public function decrypt($value)
     {
         try {
-            if ($this->base64) {
+            if (!$this->binaryOutput) {
                 $value = base64_decode($value, true);
                 if ($value === false) {
                     throw SymmetricEncryptionException::invalidCiphertext(new InvalidCiphertextException());

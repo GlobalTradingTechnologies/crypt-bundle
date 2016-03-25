@@ -7,23 +7,18 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes128;
+namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes;
 
-use Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Decryptor;
-use Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader;
+use Gtt\Bundle\CryptBundle\Bridge\Aes\AesDecryptor;
+use Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader;
 use PHPUnit_Framework_TestCase as TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 /**
  * Tests for symmetric decryptor
  */
-class Aes128DecryptorTest extends TestCase
+class AesDecryptorTest extends TestCase
 {
-    /**
-     * Example base64-encoded ciphertext
-     */
-    const BASE64_CIPHERTEXT = 'NdoMAyNHhD/U4QKoPo50ZHym8KbKUok7uikkHTnbHoG/+yAcCTdDbCcs8AwcZU+M3/Hcp7RSUiiJe/gvI0QS3Q==';
-
     /**
      * Key reader mock
      *
@@ -36,13 +31,13 @@ class Aes128DecryptorTest extends TestCase
      */
     protected function setUp()
     {
-        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader')
+        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader')
             ->disableOriginalConstructor()
             ->getMock();
         $this->keyReader
             ->expects($this->once())
             ->method('read')
-            ->willReturn(KeyReaderTest::TEST_KEY);
+            ->willReturn(Fixtures::key());
     }
 
     /**
@@ -52,24 +47,24 @@ class Aes128DecryptorTest extends TestCase
      */
     public function provideDecrypt()
     {
-        return array(
-            array(true, self::BASE64_CIPHERTEXT, 'test'),
-            array(false, base64_decode(self::BASE64_CIPHERTEXT), 'test'),
-        );
+        return [
+            [false, Fixtures::ciphertext(), Fixtures::PLAIN_TEXT],
+            [true, base64_decode(Fixtures::ciphertext()), Fixtures::PLAIN_TEXT],
+        ];
     }
 
     /**
      * Decryption test
      *
-     * @param bool   $base64     Ciphertext base64 encoded
-     * @param string $ciphertext Ciphertext
-     * @param string $expected   Expected result
+     * @param bool   $binaryOutput Ciphertext base64 encoded
+     * @param string $ciphertext   Ciphertext
+     * @param string $expected     Expected result
      *
      * @dataProvider provideDecrypt
      */
-    public function testDecrypt($base64, $ciphertext, $expected)
+    public function testDecrypt($binaryOutput, $ciphertext, $expected)
     {
-        $decryptor = new Aes128Decryptor($this->keyReader, $base64);
+        $decryptor = new AesDecryptor($this->keyReader, $binaryOutput);
         $this->assertEquals($expected, $decryptor->decrypt($ciphertext));
     }
 
@@ -81,7 +76,7 @@ class Aes128DecryptorTest extends TestCase
      */
     public function testCannotPerformOperation()
     {
-        $decryptor = new Aes128Decryptor($this->keyReader, true);
+        $decryptor = new AesDecryptor($this->keyReader, true);
         $decryptor->decrypt('something wrong');
     }
 }

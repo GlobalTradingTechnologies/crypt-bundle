@@ -7,17 +7,17 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes128;
+namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes;
 
-use Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Encryptor;
-use Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader;
+use Gtt\Bundle\CryptBundle\Bridge\Aes\AesEncryptor;
+use Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader;
 use PHPUnit_Framework_TestCase as TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 /**
  * Encryptor tests
  */
-class Aes128EncryptorTest extends TestCase
+class AesEncryptorTest extends TestCase
 {
     /**
      * Key reader mock
@@ -31,7 +31,7 @@ class Aes128EncryptorTest extends TestCase
      */
     protected function setUp()
     {
-        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader')
+        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -44,10 +44,10 @@ class Aes128EncryptorTest extends TestCase
         $this->keyReader
             ->expects($this->once())
             ->method('read')
-            ->willReturn(KeyReaderTest::TEST_KEY);
+            ->willReturn(Fixtures::key());
 
-        $encryptor = new Aes128Encryptor($this->keyReader, true);
-        $ciphertext = $encryptor->encrypt('test');
+        $encryptor = new AesEncryptor($this->keyReader, true);
+        $ciphertext = $encryptor->encrypt(Fixtures::PLAIN_TEXT);
         $this->assertNotEmpty($ciphertext);
     }
 
@@ -59,10 +59,10 @@ class Aes128EncryptorTest extends TestCase
         $this->keyReader
             ->expects($this->once())
             ->method('read')
-            ->willReturn(KeyReaderTest::TEST_KEY);
+            ->willReturn(Fixtures::key());
 
-        $encryptor = new Aes128Encryptor($this->keyReader, false);
-        $ciphertext = $encryptor->encrypt('test');
+        $encryptor = new AesEncryptor($this->keyReader, false);
+        $ciphertext = $encryptor->encrypt(Fixtures::PLAIN_TEXT);
         $this->assertNotEmpty($ciphertext);
         $this->assertNotEmpty(base64_decode($ciphertext));
     }
@@ -80,7 +80,7 @@ class Aes128EncryptorTest extends TestCase
             ->method('read')
             ->willReturn('');
 
-        $encryptor = new Aes128Encryptor($this->keyReader, true);
-        $encryptor->encrypt('test');
+        $encryptor = new AesEncryptor($this->keyReader, true);
+        $encryptor->encrypt(Fixtures::PLAIN_TEXT);
     }
 }

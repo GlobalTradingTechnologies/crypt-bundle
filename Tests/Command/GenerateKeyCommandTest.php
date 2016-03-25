@@ -1,16 +1,11 @@
 <?php
 /**
- * Global Trading Technologies Ltd.
+ * This file is part of the Global Trading Technologies Ltd crypt-bundle package.
  *
- * The following source code is PROPRIETARY AND CONFIDENTIAL. Use of
- * this source code is governed by the Global Trading Technologies Ltd.
- * Non-Disclosure Agreement previously entered between you and Global Trading
- * Technologies Ltd.
- *
- * By accessing, using, copying, modifying or distributing this
- * software, you acknowledge that you have been informed of your
- * obligations under the Agreement and agree to abide by those obligations.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 
 namespace Gtt\Bundle\CryptBundle\Tests\Command;
 
@@ -102,7 +97,7 @@ class GenerateKeyCommandTest extends TestCase
      */
     private function executeSubject($args, $expectedExitCode, $expectedOutput)
     {
-        $input    = new StringInput("crypt:aes128:generate-key $args");
+        $input    = new StringInput("crypt:aes:generate-key $args");
         $output   = new BufferedOutput();
         $exitCode = $this->app->run($input, $output);
         $message  = $output->fetch();
