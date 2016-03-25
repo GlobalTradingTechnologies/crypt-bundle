@@ -7,17 +7,17 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Symmetric;
+namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes128;
 
-use Gtt\Bundle\CryptBundle\Bridge\Symmetric\SymmetricDecryptor;
-use Gtt\Bundle\CryptBundle\Bridge\Symmetric\KeyReader;
+use Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Decryptor;
+use Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader;
 use PHPUnit_Framework_TestCase as TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 /**
  * Tests for symmetric decryptor
  */
-class SymmetricDecryptorTest extends TestCase
+class Aes128DecryptorTest extends TestCase
 {
     /**
      * Example base64-encoded ciphertext
@@ -36,7 +36,7 @@ class SymmetricDecryptorTest extends TestCase
      */
     protected function setUp()
     {
-        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Symmetric\KeyReader')
+        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader')
             ->disableOriginalConstructor()
             ->getMock();
         $this->keyReader
@@ -69,7 +69,7 @@ class SymmetricDecryptorTest extends TestCase
      */
     public function testDecrypt($base64, $ciphertext, $expected)
     {
-        $decryptor = new SymmetricDecryptor($this->keyReader, $base64);
+        $decryptor = new Aes128Decryptor($this->keyReader, $base64);
         $this->assertEquals($expected, $decryptor->decrypt($ciphertext));
     }
 
@@ -81,7 +81,7 @@ class SymmetricDecryptorTest extends TestCase
      */
     public function testCannotPerformOperation()
     {
-        $decryptor = new SymmetricDecryptor($this->keyReader, true);
+        $decryptor = new Aes128Decryptor($this->keyReader, true);
         $decryptor->decrypt('something wrong');
     }
 }

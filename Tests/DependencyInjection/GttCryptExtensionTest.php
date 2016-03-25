@@ -20,6 +20,31 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class GttCryptExtensionTest extends TestCase
 {
     /**
+     * Just a temporary file
+     *
+     * @var string
+     */
+    private $existentKeyFile;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        $this->existentKeyFile = tempnam(sys_get_temp_dir(), 'test');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        if (file_exists($this->existentKeyFile)) {
+            unset($this->existentKeyFile);
+        }
+    }
+
+    /**
      * Test load multiple cryptors
      */
     public function testLoadAll()
@@ -30,9 +55,9 @@ class GttCryptExtensionTest extends TestCase
                     'foo' => array(),
                     'bar' => array(),
                 ),
-                'symmetric' => array(
-                    'baz' => array('path' => 'baz-key', 'base64' => false),
-                    'qux' => array('path' => 'qux-key', 'base64' => true),
+                'aes128' => array(
+                    'baz' => array('key_path' => $this->existentKeyFile, 'base64' => false),
+                    'qux' => array('key_path' => $this->existentKeyFile, 'base64' => true),
                 ),
             ),
         );
@@ -45,10 +70,10 @@ class GttCryptExtensionTest extends TestCase
             $test->assertTrue($container->has('gtt.crypt.rsa.zend_rsa.foo'));
             $test->assertTrue($container->has('gtt.crypt.rsa.zend_rsa.bar'));
 
-            $test->assertTrue($container->has('gtt.crypt.symmetric.key_reader.baz'));
-            $test->assertTrue($container->has('gtt.crypt.symmetric.key_reader.qux'));
-            $test->assertEquals('baz-key', $container->getDefinition('gtt.crypt.symmetric.key_reader.baz')->getArgument(0));
-            $test->assertEquals('qux-key', $container->getDefinition('gtt.crypt.symmetric.key_reader.qux')->getArgument(0));
+            $test->assertTrue($container->has('gtt.crypt.aes128.key_reader.baz'));
+            $test->assertTrue($container->has('gtt.crypt.aes128.key_reader.qux'));
+            $test->assertEquals($this->existentKeyFile, $container->getDefinition('gtt.crypt.aes128.key_reader.baz')->getArgument(0));
+            $test->assertEquals($this->existentKeyFile, $container->getDefinition('gtt.crypt.aes128.key_reader.qux')->getArgument(0));
 
             $this->assertFalse($container->getDefinition('gtt.crypt.encryptor.baz')->getArgument(1));
             $this->assertTrue($container->getDefinition('gtt.crypt.encryptor.qux')->getArgument(1));
@@ -68,17 +93,17 @@ class GttCryptExtensionTest extends TestCase
                 array(
                     'cryptors' => array(
                         'rsa'       => array('foo' => array()),
-                        'symmetric' => array('foo' => array('path' => 'whatever', 'base64' => false)),
+                        'aes128' => array('foo' => array('key_path' => $this->existentKeyFile, 'base64' => false)),
                     ),
                 ),
             ),
             array(
-                'The child node "path" at path "gtt_crypt.cryptors.symmetric.foo" must be configured',
-                array('cryptors' => array('symmetric' => array('foo' => array()))),
+                'The child node "key_path" at path "gtt_crypt.cryptors.aes128.foo" must be configured',
+                array('cryptors' => array('aes128' => array('foo' => array()))),
             ),
             array(
-                'The child node "base64" at path "gtt_crypt.cryptors.symmetric.foo" must be configured',
-                array('cryptors' => array('symmetric' => array('foo' => array('path' => '')))),
+                'The child node "base64" at path "gtt_crypt.cryptors.aes128.foo" must be configured',
+                array('cryptors' => array('aes128' => array('foo' => array('key_path' => $this->existentKeyFile)))),
             ),
         );
     }

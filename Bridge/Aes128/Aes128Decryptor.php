@@ -7,7 +7,7 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Bridge\Symmetric;
+namespace Gtt\Bundle\CryptBundle\Bridge\Aes128;
 
 use Gtt\Bundle\CryptBundle\Encryption\DecryptorInterface;
 use Gtt\Bundle\CryptBundle\Exception\SymmetricEncryptionException;
@@ -19,7 +19,7 @@ use CannotPerformOperationException;
 /**
  * Perform symmetric decryption of ciphertext
  */
-class SymmetricDecryptor implements DecryptorInterface
+class Aes128Decryptor implements DecryptorInterface
 {
     /**
      * Key reader

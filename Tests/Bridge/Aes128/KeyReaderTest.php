@@ -7,11 +7,10 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Symmetric;
+namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes128;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use Gtt\Bundle\CryptBundle\Bridge\Symmetric\KeyReader;
-use Crypto;
+use Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader;
 
 /**
  * Tests for key reader

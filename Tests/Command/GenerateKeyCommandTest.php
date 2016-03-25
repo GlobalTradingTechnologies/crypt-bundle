@@ -102,7 +102,7 @@ class GenerateKeyCommandTest extends TestCase
      */
     private function executeSubject($args, $expectedExitCode, $expectedOutput)
     {
-        $input    = new StringInput("crypt:symmetric:generate-key $args");
+        $input    = new StringInput("crypt:aes128:generate-key $args");
         $output   = new BufferedOutput();
         $exitCode = $this->app->run($input, $output);
         $message  = $output->fetch();

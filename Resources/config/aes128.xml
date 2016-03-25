@@ -6,16 +6,16 @@
 
     <services>
 
-        <service id="gtt.crypt.symmetric.key_reader" class="Zend\Crypt\PublicKey\Rsa" public="false" abstract="true">
+        <service id="gtt.crypt.aes128.key_reader" class="Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader" public="false" abstract="true">
             <argument/> <!-- Path o a key file -->
         </service>
 
-        <service id="gtt.crypt.symmetric.encryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Symmetric\SymmetricEncryptor" abstract="true">
+        <service id="gtt.crypt.aes128.encryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Encryptor" abstract="true">
             <argument/> <!-- Concrete key reader -->
             <argument/> <!-- Apply base64 -->
         </service>
 
-        <service id="gtt.crypt.symmetric.decryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Symmetric\SymmetricDecryptor" abstract="true">
+        <service id="gtt.crypt.aes128.decryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Decryptor" abstract="true">
             <argument/> <!-- Concrete key reader -->
             <argument/> <!-- Apply base64 -->
         </service>

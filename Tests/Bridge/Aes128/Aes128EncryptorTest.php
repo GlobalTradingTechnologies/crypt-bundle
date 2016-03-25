@@ -7,17 +7,17 @@
  */
 
 
-namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Symmetric;
+namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes128;
 
-use Gtt\Bundle\CryptBundle\Bridge\Symmetric\SymmetricEncryptor;
-use Gtt\Bundle\CryptBundle\Bridge\Symmetric\KeyReader;
+use Gtt\Bundle\CryptBundle\Bridge\Aes128\Aes128Encryptor;
+use Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader;
 use PHPUnit_Framework_TestCase as TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 /**
  * Encryptor tests
  */
-class SymmetricEncryptorTest extends TestCase
+class Aes128EncryptorTest extends TestCase
 {
     /**
      * Key reader mock
@@ -31,7 +31,7 @@ class SymmetricEncryptorTest extends TestCase
      */
     protected function setUp()
     {
-        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Symmetric\KeyReader')
+        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Aes128\KeyReader')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -46,7 +46,7 @@ class SymmetricEncryptorTest extends TestCase
             ->method('read')
             ->willReturn(KeyReaderTest::TEST_KEY);
 
-        $encryptor = new SymmetricEncryptor($this->keyReader, true);
+        $encryptor = new Aes128Encryptor($this->keyReader, true);
         $ciphertext = $encryptor->encrypt('test');
         $this->assertNotEmpty($ciphertext);
     }
@@ -61,7 +61,7 @@ class SymmetricEncryptorTest extends TestCase
             ->method('read')
             ->willReturn(KeyReaderTest::TEST_KEY);
 
-        $encryptor = new SymmetricEncryptor($this->keyReader, false);
+        $encryptor = new Aes128Encryptor($this->keyReader, false);
         $ciphertext = $encryptor->encrypt('test');
         $this->assertNotEmpty($ciphertext);
         $this->assertNotEmpty(base64_decode($ciphertext));
@@ -80,7 +80,7 @@ class SymmetricEncryptorTest extends TestCase
             ->method('read')
             ->willReturn('');
 
-        $encryptor = new SymmetricEncryptor($this->keyReader, true);
+        $encryptor = new Aes128Encryptor($this->keyReader, true);
         $encryptor->encrypt('test');
     }
 }

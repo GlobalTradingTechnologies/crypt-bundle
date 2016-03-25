@@ -26,7 +26,7 @@ class GenerateKeyCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('crypt:symmetric:generate-key')
+        $this->setName('crypt:aes128:generate-key')
             ->setDescription('Generate a random encryption key')
             ->addArgument('filename', InputArgument::REQUIRED);
     }

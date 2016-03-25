@@ -66,8 +66,8 @@ class GttCryptExtension extends Extension
             case 'rsa':
                 $this->registerRsaCryptor($name, $cryptorConfig, $registryDefinition, $container);
                 break;
-            case 'symmetric':
-                $this->registerSymmetricCryptor($name, $cryptorConfig, $registryDefinition, $container);
+            case 'aes128':
+                $this->registerAes128Cryptor($name, $cryptorConfig, $registryDefinition, $container);
                 break;
             default:
                 throw new InvalidConfigurationException(sprintf('The cryptor type "%s" is not support', $type));
@@ -115,27 +115,30 @@ class GttCryptExtension extends Extension
      * @param Definition       $registryDefinition  registry service definition
      * @param ContainerBuilder $container           container
      */
-    protected function registerSymmetricCryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
+    protected function registerAes128Cryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
     {
-        $keyReaderDefinition = new DefinitionDecorator('gtt.crypt.symmetric.key_reader');
-        $keyReaderDefinition->replaceArgument(0, $cryptorConfig['path']);
+        $keyReaderDefinition = new DefinitionDecorator('gtt.crypt.aes128.key_reader');
+        if (!is_readable($cryptorConfig['key_path'])) {
+            throw new InvalidConfigurationException(sprintf('Unable to read key file %s', $cryptorConfig['key_path']));
+        }
+        $keyReaderDefinition->replaceArgument(0, $cryptorConfig['key_path']);
         $keyReaderDefinition->setPublic(false);
-        $keyReaderDefinitionId = "gtt.crypt.symmetric.key_reader.$name";
+        $keyReaderDefinitionId = "gtt.crypt.aes128.key_reader.$name";
         $container->setDefinition($keyReaderDefinitionId, $keyReaderDefinition);
         $keyReaderReference = new Reference($keyReaderDefinitionId);
 
-        $symmetricEncryptorDefinition = new DefinitionDecorator('gtt.crypt.symmetric.encryptor');
-        $symmetricEncryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
+        $aesEncryptorDefinition = new DefinitionDecorator('gtt.crypt.aes128.encryptor');
+        $aesEncryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
 
-        $symmetricDecryptorDefinition = new DefinitionDecorator('gtt.crypt.symmetric.decryptor');
-        $symmetricDecryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
+        $aesDecryptorDefinition = new DefinitionDecorator('gtt.crypt.aes128.decryptor');
+        $aesDecryptorDefinition->setArguments(array($keyReaderReference, $cryptorConfig['base64']));
 
         $this->setCryptorsPair(
             $name,
             $container,
             $registryDefinition,
-            $symmetricEncryptorDefinition,
-            $symmetricDecryptorDefinition
+            $aesEncryptorDefinition,
+            $aesDecryptorDefinition
         );
     }
 
