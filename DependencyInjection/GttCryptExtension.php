@@ -66,6 +66,9 @@ class GttCryptExtension extends Extension
             case 'rsa':
                 $this->registerRsaCryptor($name, $cryptorConfig, $registryDefinition, $container);
                 break;
+            case 'aes':
+                $this->registerAesCryptor($name, $cryptorConfig, $registryDefinition, $container);
+                break;
             default:
                 throw new InvalidConfigurationException(sprintf('The cryptor type "%s" is not support', $type));
         }
@@ -95,15 +98,75 @@ class GttCryptExtension extends Extension
         $rsaDecryptorDefinition = new DefinitionDecorator('gtt.crypt.rsa.decryptor');
         $rsaDecryptorDefinition->replaceArgument(0, $zendRsaReference);
 
-        $rsaEncryptorDefinitionId = CryptorServiceIdGenerator::generateEncryptorId($name);
-        $rsaDecryptorDefinitionId = CryptorServiceIdGenerator::generateDecryptorId($name);
+        $this->setCryptorsPair(
+            $name,
+            $container,
+            $registryDefinition,
+            $rsaEncryptorDefinition,
+            $rsaDecryptorDefinition
+        );
+    }
 
-        $container->addDefinitions(array(
-            $rsaEncryptorDefinitionId => $rsaEncryptorDefinition,
-            $rsaDecryptorDefinitionId => $rsaDecryptorDefinition
-        ));
+    /**
+     * Register the symmetric cryptors in container
+     *
+     * @param string           $name                cryptor name
+     * @param array            $cryptorConfig       cryptor config
+     * @param Definition       $registryDefinition  registry service definition
+     * @param ContainerBuilder $container           container
+     */
+    protected function registerAesCryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
+    {
+        $keyReaderDefinition = new DefinitionDecorator('gtt.crypt.aes.key_reader');
+        if (!is_readable($cryptorConfig['key_path'])) {
+            throw new InvalidConfigurationException(sprintf('Unable to read key file %s', $cryptorConfig['key_path']));
+        }
+        $keyReaderDefinition->replaceArgument(0, $cryptorConfig['key_path']);
+        $keyReaderDefinition->setPublic(false);
+        $keyReaderDefinitionId = "gtt.crypt.aes.key_reader.$name";
+        $container->setDefinition($keyReaderDefinitionId, $keyReaderDefinition);
+        $keyReaderReference = new Reference($keyReaderDefinitionId);
 
-        $registryDefinition->addMethodCall('addEncryptor', array($name, new Reference($rsaEncryptorDefinitionId)));
-        $registryDefinition->addMethodCall('addDecryptor', array($name, new Reference($rsaDecryptorDefinitionId)));
+        $aesEncryptorDefinition = new DefinitionDecorator('gtt.crypt.aes.encryptor');
+        $aesEncryptorDefinition->setArguments([$keyReaderReference, $cryptorConfig['binary_output']]);
+
+        $aesDecryptorDefinition = new DefinitionDecorator('gtt.crypt.aes.decryptor');
+        $aesDecryptorDefinition->setArguments([$keyReaderReference, $cryptorConfig['binary_output']]);
+
+        $this->setCryptorsPair(
+            $name,
+            $container,
+            $registryDefinition,
+            $aesEncryptorDefinition,
+            $aesDecryptorDefinition
+        );
+    }
+
+    /**
+     * Add encryptor and decryptor definitions to container and cryptor registry
+     *
+     * @param string           $name                Cryptor name
+     * @param ContainerBuilder $container           Container
+     * @param Definition       $registryDefinition  Registry definition
+     * @param Definition       $encryptorDefinition Encryptor definition
+     * @param Definition       $decryptorDefinition Decryptor definition
+     */
+    private function setCryptorsPair(
+        $name,
+        ContainerBuilder $container,
+        Definition $registryDefinition,
+        Definition $encryptorDefinition,
+        Definition $decryptorDefinition)
+    {
+        $encryptorDefinitionId = CryptorServiceIdGenerator::generateEncryptorId($name);
+        $decryptorDefinitionId = CryptorServiceIdGenerator::generateDecryptorId($name);
+
+        $container->addDefinitions([
+            $encryptorDefinitionId => $encryptorDefinition,
+            $decryptorDefinitionId => $decryptorDefinition,
+        ]);
+
+        $registryDefinition->addMethodCall('addEncryptor', [$name, new Reference($encryptorDefinitionId)]);
+        $registryDefinition->addMethodCall('addDecryptor', [$name, new Reference($decryptorDefinitionId)]);
     }
 }
