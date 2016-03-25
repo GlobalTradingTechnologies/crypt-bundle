@@ -11,7 +11,7 @@ Provides a simple way to configure symfony services for data encryption and decr
 Requirements
 ============
 
-Requires only PHP 5.3+ and symfony/framework-bundle.
+Requires only PHP 5.5+ and symfony/framework-bundle.
 
 Installation
 ============
@@ -23,6 +23,14 @@ composer require gtt/crypt-bundle
 ```
 After that you need to register the bundle inside your application kernel.
 
+Also you probably need to install specific crypto libraries such as
+
+```
+composer install zendframework/zend-crypt
+composer install defuse/php-encryption
+```
+(You can add the libraries that you need. All of them are optional.)
+
 Encryption
 ==========
 
@@ -33,3 +41,4 @@ This implementations are registered as a Symfony 2 services and can be injected 
 Supported encryption components
 ===============================
 * RSA (Based on [zendframework/zend-crypt](https://github.com/zendframework/zend-crypt))
+* AES (Based on [defuse/php-encryption](https://github.com/defuse/php-encryption/))
