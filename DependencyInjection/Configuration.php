@@ -62,7 +62,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('private_key')->end()
                                     ->scalarNode('pass_phrase')->end()
                                     ->scalarNode('public_key')->end()
-                                    ->scalarNode('binary_output')->defaultNull()->defaultTrue()->end()
+                                    ->scalarNode('binary_output')->defaultTrue()->end()
                                     ->scalarNode('hash_algorithm')->defaultValue('sha1')->end()
                                 ->end()
                             ->end()
