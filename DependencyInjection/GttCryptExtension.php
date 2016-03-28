@@ -128,10 +128,12 @@ class GttCryptExtension extends Extension
         $keyReaderReference = new Reference($keyReaderDefinitionId);
 
         $aesEncryptorDefinition = new DefinitionDecorator('gtt.crypt.aes.encryptor');
-        $aesEncryptorDefinition->setArguments([$keyReaderReference, $cryptorConfig['binary_output']]);
+        $aesEncryptorDefinition->replaceArgument(0, $keyReaderReference);
+        $aesEncryptorDefinition->replaceArgument(1, $cryptorConfig['binary_output']);
 
         $aesDecryptorDefinition = new DefinitionDecorator('gtt.crypt.aes.decryptor');
-        $aesDecryptorDefinition->setArguments([$keyReaderReference, $cryptorConfig['binary_output']]);
+        $aesDecryptorDefinition->replaceArgument(0, $keyReaderReference);
+        $aesDecryptorDefinition->replaceArgument(1, $cryptorConfig['binary_output']);
 
         $this->setCryptorsPair(
             $name,
