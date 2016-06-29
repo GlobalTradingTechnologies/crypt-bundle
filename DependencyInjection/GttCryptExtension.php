@@ -118,9 +118,6 @@ class GttCryptExtension extends Extension
     protected function registerAesCryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
     {
         $keyReaderDefinition = new DefinitionDecorator('gtt.crypt.aes.key_reader');
-        if (!is_readable($cryptorConfig['key_path'])) {
-            throw new InvalidConfigurationException(sprintf('Unable to read key file %s', $cryptorConfig['key_path']));
-        }
         $keyReaderDefinition->replaceArgument(0, $cryptorConfig['key_path']);
         $keyReaderDefinition->setPublic(false);
         $keyReaderDefinitionId = "gtt.crypt.aes.key_reader.$name";
