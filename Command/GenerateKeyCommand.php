@@ -41,13 +41,16 @@ class GenerateKeyCommand extends Command
             $result = file_put_contents($input->getArgument('filename'), $key, LOCK_EX);
             if ($result === false) {
                 $output->writeln('<error>Unable to save the key.</error>');
+                return 1;
             } else {
                 $output->writeln('<info>Done.</info>');
             }
         } catch (CryptoTestFailedException $e) {
             $output->writeln('<error>Cannot safely create a key.</error>');
+            return 1;
         } catch (CannotPerformOperationException $e) {
             $output->writeln('<error>Cannot safely create a key.</error>');
+            return 1;
         }
     }
 }
