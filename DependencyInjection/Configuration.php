@@ -103,7 +103,6 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('pass_phrase')->end()
                     ->scalarNode('public_key')->end()
                     ->scalarNode('binary_output')->defaultTrue()->end()
-                    ->scalarNode('hash_algorithm')->defaultValue('sha1')->end()
                 ->end()
             ->end();
         return $rsaNode;
