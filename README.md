@@ -44,7 +44,7 @@ class MyMagicService
     }
 }
 ```
-Implementations of this interfaces would be provided by CryptBundle. The choice of encryption algorithm is up to you - you can specify it in bundle config.
+Implementations of [EncryptorInterface](https://github.com/GlobalTradingTechnologies/crypt-bundle/blob/master/Encryption/EncryptorInterface.php) or [DecryptorInterface](https://github.com/GlobalTradingTechnologies/crypt-bundle/blob/master/Encryption/DecryptorInterface.php) would be provided by CryptBundle. The choice of encryption algorithm is up to you - you can specify it in bundle config.
 
 Requirements
 ============
