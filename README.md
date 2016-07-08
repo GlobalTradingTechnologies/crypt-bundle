@@ -7,6 +7,44 @@ CryptBundle
 [![License](https://poser.pugx.org/gtt/crypt-bundle/license)](https://packagist.org/packages/gtt/crypt-bundle)
 
 Provides a simple way to configure Symfony services for data encryption and decryption based on well-known encryption algorithms.
+With the help of this CryptBundle you can encrypt or decrypt your data as simple as operate with elementary [EncryptorInterface](https://github.com/GlobalTradingTechnologies/crypt-bundle/blob/master/Encryption/EncryptorInterface.php) or [DecryptorInterface](https://github.com/GlobalTradingTechnologies/crypt-bundle/blob/master/Encryption/DecryptorInterface.php):
+```php
+use Gtt\Bundle\CryptBundle\Encryption\EncryptorInterface;
+use Gtt\Bundle\CryptBundle\Encryption\DecryptorInterface;
+
+class MyMagicService
+{    
+    /**
+     * Encryptor
+     *
+     * @var EncryptorInterface
+     */
+    protected $encryptor;
+ 
+    /**
+     * Decryptor
+     *
+     * @var DecryptorInterface
+     */
+    protected $decryptor;
+    
+    public function __construct(EncryptorInterface $encryptor, DecryptorInterface $decryptor)
+    {
+        $this->encryptor = $encryptor;
+        $this->decryptor = $decryptor;
+    }
+    
+    public function doSomeMagic()
+    {
+        $someStringData = "Crypt me!";
+        $encrypted = $this->encryptor->encrypt($someStringData);
+        $decrypted = $this->decryptor->decrypt($encrypted);
+        
+        return $someStringData == $decrypted;
+    }
+}
+```
+Implementations of this interfaces would be provided by CryptBundle. The choice of encryption algorithm is up to you - you can specify it in bundle config.
 
 Requirements
 ============
@@ -95,7 +133,7 @@ services:
             - { name: gtt.crypt.decryptor.aware, cryptor_name: "aes_binary_cryptor" }
 ```
 ### Inject cryptors directly by service id
-Each encryptor or decryptor configured by crypt-bundle is a service with id constructed in accordance with the following pattern:
+Each encryptor or decryptor configured by CryptBundle is a service with id constructed in accordance with the following pattern:
 `gtt.crypt.encryptor.<name>` for encryptors and `gtt.crypt.decryptor.<name>`, where <name> holds corresponding cryptor name defined in bundle config.
 For example if you use configuration such as in [Configuration section](#Configuration) the <name> value can be one of _aes_binary_cryptor_, _aes_log_cryptor_ or _rsa_default_cryptor_.
 You can simply inject these services in DI-configs of your bundles.
