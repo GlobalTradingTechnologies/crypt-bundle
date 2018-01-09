@@ -141,6 +141,7 @@ You can simply inject these services in DI-configs of your bundles.
 Crypt-bundle also registers [CryptorRegistry](https://github.com/GlobalTradingTechnologies/crypt-bundle/blob/master/CryptorRegistry.php) service with id _gtt.crypt.registry_ that collects all the encryptors and decryptors configured.
 You can use it to get cryptors by calling getEncryptor or getDecryptor methods with name of the encryptor or decryptor specified.
 For example if you use configuration such as in [Configuration section](#Configuration) the name can be one of _aes_binary_cryptor_, _aes_log_cryptor_ or _rsa_default_cryptor_.
+
 Supported encryption components
 ===============================
 * RSA (Based on [zendframework/zend-crypt](https://github.com/zendframework/zend-crypt))
