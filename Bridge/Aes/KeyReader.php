@@ -9,7 +9,7 @@
 namespace Gtt\Bundle\CryptBundle\Bridge\Aes;
 
 use Gtt\Bundle\CryptBundle\Exception\KeyReaderException;
-use Crypto;
+use Defuse\Crypto\Core as CryptoCore;
 
 /**
  * Simple service to read the key from specific file.
@@ -42,7 +42,7 @@ class KeyReader
      */
     public function read()
     {
-        $key = file_get_contents($this->keyPath, false, null, 0, Crypto::KEY_BYTE_SIZE);
+        $key = file_get_contents($this->keyPath, false, null, 0, CryptoCore::KEY_BYTE_SIZE);
         if ($key === false) {
             throw new KeyReaderException($this->keyPath);
         }

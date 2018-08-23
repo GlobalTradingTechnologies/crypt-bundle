@@ -10,7 +10,7 @@
 namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes;
 
 use LogicException;
-use Crypto;
+use Defuse\Crypto\Core as CryptoCore;
 
 /**
  * Provide related key, plaintext and ciphertext that corresponds
@@ -30,7 +30,7 @@ abstract class Fixtures
      */
     public static function bits()
     {
-        return Crypto::KEY_BYTE_SIZE * 8;
+        return CryptoCore::KEY_BYTE_SIZE * 8;
     }
 
     /**
@@ -40,9 +40,9 @@ abstract class Fixtures
      */
     public static function key()
     {
-        if (Crypto::KEY_BYTE_SIZE === 16) {
+        if (CryptoCore::KEY_BYTE_SIZE === 16) {
             return '0123456789ABCDEF';
-        } elseif (Crypto::KEY_BYTE_SIZE === 32) {
+        } elseif (CryptoCore::KEY_BYTE_SIZE === 32) {
             return '0123456789ABCDEF0123456789ABCDEF';
         } else {
             throw new LogicException('Library version is not supported');
@@ -56,9 +56,9 @@ abstract class Fixtures
      */
     public static function ciphertext()
     {
-        if (Crypto::KEY_BYTE_SIZE === 16) {
+        if (CryptoCore::KEY_BYTE_SIZE === 16) {
             return 'dBWc9OIf6qEo5PvFfaCPcupFS2iKZDUkJxMyenHZkEmO/8mbKIKhH8YjFvMhxpVi0GXDXGdf2lazKs7zbScE7JI+wJA0P2V5GCNFhRotUYU=';
-        } elseif (Crypto::KEY_BYTE_SIZE === 32) {
+        } elseif (CryptoCore::KEY_BYTE_SIZE === 32) {
             return 'TODO: change this string to ciphertext encoded by key from method self::key()';
         } else {
             throw new LogicException('Library version is not supported');

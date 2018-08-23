@@ -9,9 +9,8 @@
 namespace Gtt\Bundle\CryptBundle\Exception;
 
 use RuntimeException;
-use InvalidCiphertextException;
-use CryptoTestFailedException;
-use CannotPerformOperationException;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
+use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 
 /**
  * Error that occurred when application cannot safely perform encryption.
@@ -34,39 +33,53 @@ class SymmetricEncryptionException extends RuntimeException implements Exception
     const INVALID_CIPHER_TEXT = 3;
 
     /**
-     * Create exception for failed crypto test
+     * Possible error code: environment is broken
+     */
+    const ENVIRONMENT_IS_BROKEN = 4;
+
+    /**
+     * Possible error code: wrong key or modified ciphertext
+     */
+    const WRONG_KEY_OR_MODIFIED_CIPHERTEXT = 5;
+
+    /**
+     * Possible error code: type error
+     */
+    const TYPE_ERROR = 6;
+
+    /**
+     * Create exception for broken environment
      *
-     * @param CryptoTestFailedException $e Previous exception
+     * @param EnvironmentIsBrokenException $e
      *
      * @return SymmetricEncryptionException
      */
-    public static function cryptoTestFailed(CryptoTestFailedException $e)
+    public static function environmentIsBroken(EnvironmentIsBrokenException $e)
     {
-        return new self('Cannot safely perform encryption', self::CRYPTO_TEST_FAILED, $e);
+        return new self('Environment is broken!', self::ENVIRONMENT_IS_BROKEN, $e);
     }
 
     /**
-     * Create exception for unavailable cryptographic operation
+     * Create exception for wrong key or modified ciphertext
      *
-     * @param CannotPerformOperationException $e Previous exception
+     * @param WrongKeyOrModifiedCiphertextException $e
      *
      * @return SymmetricEncryptionException
      */
-    public static function cannotPerformOperation(CannotPerformOperationException $e)
+    public static function wrongKeyOrModifiedCiphertext(WrongKeyOrModifiedCiphertextException $e)
     {
-        return new self('Cannot safely perform decryption', self::CANNOT_PERFORM_OPERATION, $e);
+        return new self('Wrong key or modified ciphertext!', self::WRONG_KEY_OR_MODIFIED_CIPHERTEXT, $e);
     }
 
     /**
-     * Create exception for invalid ciphertext
+     * Create exception for type error
      *
-     * @param InvalidCiphertextException $e Previous exception
+     * @param \TypeError $e
      *
      * @return SymmetricEncryptionException
      */
-    public static function invalidCiphertext(InvalidCiphertextException $e)
+    public static function typeError(\TypeError $e)
     {
-        return new self('Danger! The ciphertext has been tampered with!', self::INVALID_CIPHER_TEXT, $e);
+        return new self('Type error!', self::TYPE_ERROR, $e);
     }
-
 }

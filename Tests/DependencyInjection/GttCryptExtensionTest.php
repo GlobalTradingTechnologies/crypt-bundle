@@ -13,7 +13,7 @@ use Gtt\Bundle\CryptBundle\Tests\Bridge\Aes\Fixtures;
 use PHPUnit_Framework_TestCase as TestCase;
 use Gtt\Bundle\CryptBundle\DependencyInjection\GttCryptExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Crypto;
+use Defuse\Crypto\Core as CryptoCore;
 
 /**
  * "Integration-level" test: instead of use mocks it checks the original

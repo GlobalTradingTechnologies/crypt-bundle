@@ -11,10 +11,10 @@ namespace Gtt\Bundle\CryptBundle\Bridge\Aes;
 
 use Gtt\Bundle\CryptBundle\Encryption\DecryptorInterface;
 use Gtt\Bundle\CryptBundle\Exception\SymmetricEncryptionException;
-use Crypto;
-use InvalidCiphertextException;
-use CryptoTestFailedException;
-use CannotPerformOperationException;
+use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
+use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
+use \TypeError;
 
 /**
  * Perform symmetric decryption of ciphertext
@@ -56,16 +56,16 @@ class AesDecryptor implements DecryptorInterface
             if (!$this->binaryOutput) {
                 $value = base64_decode($value, true);
                 if ($value === false) {
-                    throw SymmetricEncryptionException::invalidCiphertext(new InvalidCiphertextException());
+                    throw SymmetricEncryptionException::typeError(new TypeError());
                 }
             }
-            return Crypto::Decrypt($value, $this->keyReader->read());
-        } catch (InvalidCiphertextException $e) {
-            throw SymmetricEncryptionException::invalidCiphertext($e);
-        } catch (CryptoTestFailedException $e) {
-            throw SymmetricEncryptionException::cryptoTestFailed($e);
-        } catch (CannotPerformOperationException $e) {
-            throw SymmetricEncryptionException::cannotPerformOperation($e);
+            return Crypto::decrypt($value, $this->keyReader->read());
+        } catch (TypeError $e) {
+            throw SymmetricEncryptionException::typeError($e);
+        } catch (EnvironmentIsBrokenException $e) {
+            throw SymmetricEncryptionException::environmentIsBroken($e);
+        } catch (WrongKeyOrModifiedCiphertextException $e) {
+            throw SymmetricEncryptionException::wrongKeyOrModifiedCiphertext($e);
         }
     }
 }

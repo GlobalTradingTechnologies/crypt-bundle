@@ -12,9 +12,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
-use Crypto;
-use CryptoTestFailedException;
-use CannotPerformOperationException;
+use Defuse\Crypto\Core as CryptoCore;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 
 /**
  * Symmetric encryption key generator
@@ -37,7 +36,7 @@ class GenerateKeyCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $key    = Crypto::CreateNewRandomKey();
+            $key    = CryptoCore::secureRandom(CryptoCore::KEY_BYTE_SIZE);
             $result = file_put_contents($input->getArgument('filename'), $key, LOCK_EX);
             if ($result === false) {
                 $output->writeln('<error>Unable to save the key.</error>');
@@ -45,10 +44,7 @@ class GenerateKeyCommand extends Command
             } else {
                 $output->writeln('<info>Done.</info>');
             }
-        } catch (CryptoTestFailedException $e) {
-            $output->writeln('<error>Cannot safely create a key.</error>');
-            return 1;
-        } catch (CannotPerformOperationException $e) {
+        } catch (EnvironmentIsBrokenException $e) {
             $output->writeln('<error>Cannot safely create a key.</error>');
             return 1;
         }
