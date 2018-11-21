@@ -14,6 +14,8 @@ use Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader;
 use PHPUnit_Framework_TestCase as TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
+use Defuse\Crypto\Key as CryptoKey;
+
 /**
  * Tests for symmetric decryptor
  */
@@ -37,7 +39,7 @@ class AesDecryptorTest extends TestCase
         $this->keyReader
             ->expects($this->once())
             ->method('read')
-            ->willReturn(Fixtures::key());
+            ->willReturn(CryptoKey::loadFromAsciiSafeString(Fixtures::key()));
     }
 
     /**
@@ -72,7 +74,7 @@ class AesDecryptorTest extends TestCase
      * Test attempt to decrypt invalid ciphertext.
      *
      * @expectedException \Gtt\Bundle\CryptBundle\Exception\SymmetricEncryptionException
-     * @expectedExceptionMessage Danger! The ciphertext has been tampered with!
+     * @expectedExceptionMessage Wrong key or modified ciphertext
      */
     public function testCannotPerformOperation()
     {

@@ -18,7 +18,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zend\Crypt\PublicKey\Rsa;
-use Crypto;
+
+use Defuse\Crypto\Core as CryptoCore;
 
 /**
  * Bundle configuration
@@ -76,7 +77,7 @@ class Configuration implements ConfigurationInterface
         if (class_exists(Rsa::class, true)) {
             $cryptorsNode->append($this->createRsaNode());
         }
-        if (class_exists(Crypto::class, true)) {
+        if (class_exists(CryptoCore::class, true)) {
             $cryptorsNode->append($this->createAesNode());
         }
         return $cryptorsNode;
@@ -119,11 +120,10 @@ class Configuration implements ConfigurationInterface
         $aesNode = $builder->root('aes');
         $aesNode
             ->info(sprintf(
-                'Symmetric encryption (%s, %s mode and are authenticated with HMAC-%s). ' .
+                'Symmetric encryption (%s and are authenticated with HMAC-%s). ' .
                 'Provided by and require the defuse/php-encryption package.',
-                strtoupper(Crypto::CIPHER),
-                strtoupper(Crypto::CIPHER_MODE),
-                strtoupper(Crypto::HASH_FUNCTION)
+                strtoupper(CryptoCore::CIPHER_METHOD),
+                strtoupper(CryptoCore::HASH_FUNCTION_NAME)
             ))
             ->useAttributeAsKey('name')
             ->prototype('array')
@@ -135,7 +135,7 @@ class Configuration implements ConfigurationInterface
                     ->validate()
                         ->always()
                         ->then(function ($keySize) {
-                            $expectedKeySize = Crypto::KEY_BYTE_SIZE * 8;
+                            $expectedKeySize = CryptoCore::KEY_BYTE_SIZE * 8;
                             if ($keySize !== $expectedKeySize) {
                                 throw new InvalidConfigurationException(
                                     "Installed version of defuse/php-encryption package " .
@@ -146,7 +146,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('key_path')
-                    ->info(sprintf('Path to a file that contains %d-bit key', Crypto::KEY_BYTE_SIZE * 8))
+                    ->info(sprintf('Path to a file that contains %d-bit key', CryptoCore::KEY_BYTE_SIZE * 8))
                     ->isRequired()
                 ->end()
                 ->booleanNode('binary_output')
