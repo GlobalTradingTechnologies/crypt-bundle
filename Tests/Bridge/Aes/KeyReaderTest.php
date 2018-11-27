@@ -47,21 +47,9 @@ class KeyReaderTest extends TestCase
      */
     public function testReadSuccess()
     {
-        $extra = '123';
-        file_put_contents($this->filename, Fixtures::key() . $extra, LOCK_EX);
+        file_put_contents($this->filename, Fixtures::key(), LOCK_EX);
         $subject = new KeyReader($this->filename);
-        $this->assertEquals(Fixtures::key(), $subject->read());
-    }
-
-    /**
-     * Reader should not validate key length (it is the task of cryptor)
-     */
-    public function testReadWhenKeyTooShort()
-    {
-        $key = '';
-        file_put_contents($this->filename, $key, LOCK_EX);
-        $subject = new KeyReader($this->filename);
-        $this->assertEquals('', $subject->read());
+        $this->assertEquals(Fixtures::key(), $subject->read()->saveToAsciiSafeString());
     }
 
     /**
@@ -73,6 +61,6 @@ class KeyReaderTest extends TestCase
     {
         unlink($this->filename);
         $subject = new KeyReader($this->filename);
-        @$subject->read();
+        @$subject->read()->saveToAsciiSafeString();
     }
 }

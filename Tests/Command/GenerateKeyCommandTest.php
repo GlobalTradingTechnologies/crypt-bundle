@@ -14,7 +14,6 @@ use Gtt\Bundle\CryptBundle\Command\GenerateKeyCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Crypto;
 
 /**
  * Test for key generation command
@@ -58,15 +57,6 @@ class GenerateKeyCommandTest extends TestCase
         if (file_exists($this->filename)) {
             unlink($this->filename);
         }
-    }
-
-    /**
-     * Test regular execution of command
-     */
-    public function testRegular()
-    {
-        $this->executeSubject($this->filename, 0, 'Done');
-        $this->assertEquals(Crypto::KEY_BYTE_SIZE, filesize($this->filename));
     }
 
     /**

@@ -10,9 +10,8 @@ namespace Gtt\Bundle\CryptBundle\Bridge\Aes;
 
 use Gtt\Bundle\CryptBundle\Encryption\EncryptorInterface;
 use Gtt\Bundle\CryptBundle\Exception\SymmetricEncryptionException;
-use Crypto;
-use CryptoTestFailedException;
-use CannotPerformOperationException;
+use Defuse\Crypto\Crypto as CryptoService;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 
 /**
  * Perform symmetric encryption of message
@@ -51,7 +50,7 @@ class AesEncryptor implements EncryptorInterface
     public function encrypt($value)
     {
         try {
-            $ciphertext = Crypto::Encrypt($value, $this->keyReader->read());
+            $ciphertext = CryptoService::encrypt($value, $this->keyReader->read());
             if (!$this->binaryOutput) {
                 $ciphertext = base64_encode($ciphertext);
                 if ($ciphertext === false) {
@@ -59,10 +58,10 @@ class AesEncryptor implements EncryptorInterface
                 }
             }
             return $ciphertext;
-        } catch (CryptoTestFailedException $e) {
-            throw SymmetricEncryptionException::cryptoTestFailed($e);
-        } catch (CannotPerformOperationException $e) {
-            throw SymmetricEncryptionException::cannotPerformOperation($e);
+        } catch (EnvironmentIsBrokenException $e) {
+            throw SymmetricEncryptionException::environmentIsBroken($e);
+        } catch (\TypeError $e) {
+            throw SymmetricEncryptionException::cryptoTypeError($e);
         }
     }
 }

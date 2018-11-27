@@ -14,6 +14,8 @@ use Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader;
 use PHPUnit_Framework_TestCase as TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
+use Defuse\Crypto\Key as CryptoKey;
+
 /**
  * Encryptor tests
  */
@@ -44,7 +46,7 @@ class AesEncryptorTest extends TestCase
         $this->keyReader
             ->expects($this->once())
             ->method('read')
-            ->willReturn(Fixtures::key());
+            ->willReturn(CryptoKey::loadFromAsciiSafeString(Fixtures::key()));
 
         $encryptor = new AesEncryptor($this->keyReader, true);
         $ciphertext = $encryptor->encrypt(Fixtures::PLAIN_TEXT);
@@ -59,7 +61,7 @@ class AesEncryptorTest extends TestCase
         $this->keyReader
             ->expects($this->once())
             ->method('read')
-            ->willReturn(Fixtures::key());
+            ->willReturn(CryptoKey::loadFromAsciiSafeString(Fixtures::key()));
 
         $encryptor = new AesEncryptor($this->keyReader, false);
         $ciphertext = $encryptor->encrypt(Fixtures::PLAIN_TEXT);
@@ -71,7 +73,7 @@ class AesEncryptorTest extends TestCase
      * Test encryption attempt with invalid key
      *
      * @expectedException \Gtt\Bundle\CryptBundle\Exception\SymmetricEncryptionException
-     * @expectedExceptionMessage Cannot safely perform decryption
+     * @expectedExceptionMessage Type error
      */
     public function testCannotPerformOperation()
     {

@@ -10,7 +10,8 @@
 namespace Gtt\Bundle\CryptBundle\Tests\Bridge\Aes;
 
 use LogicException;
-use Crypto;
+
+use Defuse\Crypto\Core as CryptoCore;
 
 /**
  * Provide related key, plaintext and ciphertext that corresponds
@@ -30,7 +31,7 @@ abstract class Fixtures
      */
     public static function bits()
     {
-        return Crypto::KEY_BYTE_SIZE * 8;
+        return CryptoCore::KEY_BYTE_SIZE * 8;
     }
 
     /**
@@ -40,10 +41,10 @@ abstract class Fixtures
      */
     public static function key()
     {
-        if (Crypto::KEY_BYTE_SIZE === 16) {
+        if (CryptoCore::KEY_BYTE_SIZE === 16) {
             return '0123456789ABCDEF';
-        } elseif (Crypto::KEY_BYTE_SIZE === 32) {
-            return '0123456789ABCDEF0123456789ABCDEF';
+        } elseif (CryptoCore::KEY_BYTE_SIZE === 32) {
+            return 'def000005f28d612894101adaf514dd3ab4285fadfe61f929b5860ea5412b019289500d5aa5bdc93913cf0612b4a97499175cddac2b8d9373ecaabd3b369c2e329c92ac6';
         } else {
             throw new LogicException('Library version is not supported');
         }
@@ -56,10 +57,10 @@ abstract class Fixtures
      */
     public static function ciphertext()
     {
-        if (Crypto::KEY_BYTE_SIZE === 16) {
+        if (CryptoCore::KEY_BYTE_SIZE === 16) {
             return 'dBWc9OIf6qEo5PvFfaCPcupFS2iKZDUkJxMyenHZkEmO/8mbKIKhH8YjFvMhxpVi0GXDXGdf2lazKs7zbScE7JI+wJA0P2V5GCNFhRotUYU=';
-        } elseif (Crypto::KEY_BYTE_SIZE === 32) {
-            return 'TODO: change this string to ciphertext encoded by key from method self::key()';
+        } elseif (CryptoCore::KEY_BYTE_SIZE === 32) {
+            return 'ZGVmNTAyMDA3MWIxZTFhNzAwZWY5MDYyZGUyMjJiYzkyNzBjMTVhZTMwYTI5NGQxYmI1MjNhODVjMTY2MWI5MTM1MzEzMDIwYmJjZjZlZWJkMDU0OGU3Y2E3NTJjMDQ4YmM5Y2U3YmQ3MTY3YTRlZWRkMWRlZGQxYzczYTQ5ODAzODZhYWZiMzE0Mzg0YzNjMDRjZGQ1NDNlZDczM2M3NWY5OGFlZDFmOGI4YTA2OWE1YTMyMWJmZTdiOGNjODEzZTM2M2E1YmI4Mjk2NDAzMQ==';
         } else {
             throw new LogicException('Library version is not supported');
         }
