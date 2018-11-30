@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit colors="true" bootstrap="vendor/autoload.php">
-    <testsuites>
-        <testsuite name="CryptBundle test suite">
-            <directory>./Tests</directory>
-        </testsuite>
-    </testsuites>
+<phpunit bootstrap="vendor/autoload.php">
+<testsuites>
+    <testsuite name="CryptBundle test suite">
+        <directory>tests/</directory>
+    </testsuite>
+</testsuites>
 
-    <filter>
-        <whitelist>
-            <directory>.</directory>
-            <exclude>
-                <directory>./Resources</directory>
-                <directory>./Tests</directory>
-                <directory>./vendor</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+<filter>
+    <whitelist>
+        <directory suffix=".php">src/</directory>
+        <exclude>
+            <directory>./tests</directory>
+            <directory>./vendor</directory>
+        </exclude>
+    </whitelist>
+</filter>
 </phpunit>
