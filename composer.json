@@ -10,29 +10,31 @@
         }
     ],
     "require": {
-        "php": ">=5.5",
-        "symfony/framework-bundle": "^2.3|^3",
-        "symfony/dependency-injection": "^2.3|^3",
-        "symfony/console": "^2.3|^3"
+        "php": "~7.2",
+        "symfony/dependency-injection": "^4.1",
+        "symfony/http-kernel": "^4.1",
+        "symfony/console": "^4.1",
+        "symfony/config": "^4.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0",
+        "phpunit/phpunit": "~7.0",
         "zendframework/zend-crypt": "^2.6",
-        "defuse/php-encryption": "^2.2.1"
+        "defuse/php-encryption": "^2.2.1",
+        "mikey179/vfsStream": "^1.6"
     },
     "suggest": {
         "zendframework/zend-crypt": "required in case when zend-crypt cryptographic component is used",
         "defuse/php-encryption": "requires in case when symmetric cryptography is used"
     },
     "autoload": {
-        "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "" }
+        "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "src" }
     },
     "autoload-dev": {
-        "psr-4": { "Gtt\\Bundle\\CryptBundle\\Tests\\": "Tests/" }
+        "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "tests/" }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "4.x-dev"
         }
     }
 }
