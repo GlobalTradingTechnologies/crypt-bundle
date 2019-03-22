@@ -39,7 +39,7 @@ class GenerateKeyCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $key    = CryptoKey::CreateNewRandomKey();
+            $key    = CryptoKey::createNewRandomKey();
             $result = file_put_contents($input->getArgument('filename'), $key->saveToAsciiSafeString(), LOCK_EX);
             if ($result === false) {
                 $output->writeln('<error>Unable to save the key.</error>');

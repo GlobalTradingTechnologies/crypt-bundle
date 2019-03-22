@@ -33,7 +33,7 @@ class AesDecryptorTest extends TestCase
      */
     protected function setUp()
     {
-        $this->keyReader = $this->getMockBuilder('Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader')
+        $this->keyReader = $this->getMockBuilder(KeyReader::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->keyReader

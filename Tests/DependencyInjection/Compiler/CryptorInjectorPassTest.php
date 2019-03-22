@@ -16,6 +16,8 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Gtt\Bundle\CryptBundle\Tests\DependencyInjection\Compiler\Fixtures\ValidEncryptorAwareClass;
+use Gtt\Bundle\CryptBundle\Tests\DependencyInjection\Compiler\Fixtures\ValidDecryptorAwareClass;
 
 class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +27,7 @@ class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
     public function testCryptorNameIsNotSetLeadsToException()
     {
         $container = new ContainerBuilder();
-        $cryptorAwareDefinition = new Definition("CryptorAware");
+        $cryptorAwareDefinition = new Definition('CryptorAware');
         $cryptorAwareDefinition->addTag(CryptorInjectorPass::ENCRYPTOR_AWARE_TAG);
         $container->setDefinition('aware', $cryptorAwareDefinition);
         $this->compileContainer($container);
@@ -37,7 +39,7 @@ class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
     public function testWrongCryptorNameLeadsToException()
     {
         $container = new ContainerBuilder();
-        $cryptorAwareDefinition = new Definition("CryptorAware");
+        $cryptorAwareDefinition = new Definition('CryptorAware');
         $cryptorAwareDefinition->addTag(CryptorInjectorPass::ENCRYPTOR_AWARE_TAG, array('cryptor_name' => 'cryptor1'));
         $container->setDefinition('aware', $cryptorAwareDefinition);
         $this->compileContainer($container);
@@ -60,7 +62,7 @@ class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('aware', $cryptorAwareDefinition);
 
         // cryptor definition
-        $cryptorDefinition = new Definition("Class");
+        $cryptorDefinition = new Definition('Class');
         $container->setDefinition($cryptorDefinitionName, $cryptorDefinition);
 
         $this->compileContainer($container);
@@ -69,8 +71,8 @@ class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
     public function cryptorDoesNotImplementAwareInterfaceProvider()
     {
         return array(
-            array(CryptorInjectorPass::ENCRYPTOR_AWARE_TAG, '\StdClass', "cryptor1", "gtt.crypt.encryptor.cryptor1"),
-            array(CryptorInjectorPass::DECRYPTOR_AWARE_TAG, '\StdClass', "cryptor2", "gtt.crypt.decryptor.cryptor2")
+            array(CryptorInjectorPass::ENCRYPTOR_AWARE_TAG, '\StdClass', 'cryptor1', 'gtt.crypt.encryptor.cryptor1'),
+            array(CryptorInjectorPass::DECRYPTOR_AWARE_TAG, '\StdClass', 'cryptor2', 'gtt.crypt.decryptor.cryptor2')
         );
     }
 
@@ -90,7 +92,7 @@ class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('aware', $cryptorAwareDefinition);
 
         // cryptor definition
-        $cryptorDefinition = new Definition("Class");
+        $cryptorDefinition = new Definition('Class');
         $container->setDefinition($cryptorDefinitionName, $cryptorDefinition);
 
         $this->compileContainer($container);
@@ -103,12 +105,10 @@ class CryptorInjectorPassTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                CryptorInjectorPass::ENCRYPTOR_AWARE_TAG,
-                '\Gtt\Bundle\CryptBundle\Tests\DependencyInjection\Compiler\Fixtures\ValidEncryptorAwareClass',
+                CryptorInjectorPass::ENCRYPTOR_AWARE_TAG, ValidEncryptorAwareClass::class,
                 'cryptor1',
                 'gtt.crypt.encryptor.cryptor1'),
-            array(CryptorInjectorPass::DECRYPTOR_AWARE_TAG,
-                '\Gtt\Bundle\CryptBundle\Tests\DependencyInjection\Compiler\Fixtures\ValidDecryptorAwareClass',
+            array(CryptorInjectorPass::DECRYPTOR_AWARE_TAG, ValidDecryptorAwareClass::class,
                 'cryptor2',
                 'gtt.crypt.decryptor.cryptor2')
         );

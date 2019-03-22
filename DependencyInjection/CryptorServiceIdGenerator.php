@@ -21,12 +21,12 @@ class CryptorServiceIdGenerator
     /**
      * Defines pattern for encryptor services
      */
-    const ENCRYPTOR_PATTERN = "gtt.crypt.encryptor.<name>";
+    const ENCRYPTOR_PATTERN = 'gtt.crypt.encryptor.<name>';
 
     /**
      * Defines pattern for decryptor services
      */
-    const DECRYPTOR_PATTERN = "gtt.crypt.decryptor.<name>";
+    const DECRYPTOR_PATTERN = 'gtt.crypt.decryptor.<name>';
 
     /**
      * Generates encryptor service id by its name
@@ -37,7 +37,7 @@ class CryptorServiceIdGenerator
      */
     public static function generateEncryptorId($name)
     {
-        return str_replace("<name>", $name, self::ENCRYPTOR_PATTERN);
+        return str_replace('<name>', $name, self::ENCRYPTOR_PATTERN);
     }
 
     /**
@@ -49,6 +49,6 @@ class CryptorServiceIdGenerator
      */
     public static function generateDecryptorId($name)
     {
-        return str_replace("<name>", $name, self::DECRYPTOR_PATTERN);
+        return str_replace('<name>', $name, self::DECRYPTOR_PATTERN);
     }
 }
