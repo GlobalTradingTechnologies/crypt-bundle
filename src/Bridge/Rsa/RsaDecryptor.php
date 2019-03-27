@@ -31,13 +31,22 @@ class RsaDecryptor implements DecryptorInterface
     private $zendRsa;
 
     /**
+     * OpenSSL encryption padding
+     *
+     * @var int
+     */
+    private $padding;
+
+    /**
      * RsaDecryptor constructor.
      *
-     * @param ZendRsa $zendRsa Zend rsa implementation
+     * @param ZendRsa  $zendRsa Zend rsa implementation
+     * @param int|null $padding Padding
      */
-    public function __construct(ZendRsa $zendRsa)
+    public function __construct(ZendRsa $zendRsa, int $padding = null)
     {
         $this->zendRsa = $zendRsa;
+        $this->padding = $padding;
     }
 
     /**
@@ -45,6 +54,6 @@ class RsaDecryptor implements DecryptorInterface
      */
     public function decrypt(string $value): string
     {
-        return $this->zendRsa->decrypt($value);
+        return $this->zendRsa->decrypt($value, null, ZendRsa::MODE_AUTO, $this->padding);
     }
 }

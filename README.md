@@ -49,7 +49,7 @@ Implementations of [EncryptorInterface](https://github.com/GlobalTradingTechnolo
 Requirements
 ============
 
-Requires only PHP 5.5+ and symfony/framework-bundle.
+Requires PHP 7.2+
 
 Installation
 ============
@@ -98,6 +98,7 @@ gtt_crypt:
                 private_key: "/tmp/keys/rsa/priv.key"
                 public_key: "/tmp/keys/rsa/pub.key"
                 binary_output: false
+                padding: 4
 ```
 You can see reference of configuration options for supported encryption types:
 ### RSA
@@ -105,6 +106,12 @@ You can see reference of configuration options for supported encryption types:
 - pass_phrase - RSA private key passphrase
 - public_key - path to RSA public key
 - binary_output - should be result of encryption encoded with base64 algorithm or should be input string base64-decoded before decryption
+- padding - number of distinct practices which all include adding data to the message prior to encryption.
+ Should be one of constants from list below:
+-- OPENSSL_PKCS1_PADDING
+-- OPENSSL_SSLV23_PADDING
+-- OPENSSL_NO_PADDING
+-- OPENSSL_PKCS1_OAEP_PADDING
 
 ### AES
 - key_size - AES key size. Should be 128 for 1.x or 256 for 2.x version of [defuse/php-encryption](https://github.com/defuse/php-encryption/)

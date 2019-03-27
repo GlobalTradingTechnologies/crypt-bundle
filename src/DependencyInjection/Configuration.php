@@ -106,6 +106,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('private_key')->end()
                     ->scalarNode('pass_phrase')->end()
                     ->scalarNode('public_key')->end()
+                    ->scalarNode('padding')->defaultNull()->end()
                     ->scalarNode('binary_output')->defaultFalse()->end()
                 ->end()
             ->end();

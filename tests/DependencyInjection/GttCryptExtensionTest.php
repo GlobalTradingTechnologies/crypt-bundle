@@ -11,7 +11,6 @@ namespace Gtt\Bundle\CryptBundle\DependencyInjection;
 
 use Gtt\Bundle\CryptBundle\Bridge\Aes\Fixtures;
 use PHPUnit\Framework\TestCase;
-use Gtt\Bundle\CryptBundle\DependencyInjection\GttCryptExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Crypto;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;

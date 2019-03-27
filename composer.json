@@ -24,7 +24,8 @@
     },
     "suggest": {
         "zendframework/zend-crypt": "required in case when zend-crypt cryptographic component is used",
-        "defuse/php-encryption": "requires in case when symmetric cryptography is used"
+        "defuse/php-encryption": "requires in case when symmetric cryptography is used",
+        "ext-openssl": "requires in case when RSA cryptography is used"
     },
     "autoload": {
         "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "src" }

@@ -14,10 +14,12 @@
 
         <service id="gtt.crypt.rsa.encryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaEncryptor" abstract="true">
             <argument /> <!-- Concrete zend rsa implementation -->
+            <argument /> <!-- Rsa padding -->
         </service>
 
         <service id="gtt.crypt.rsa.decryptor" lazy="true" class="Gtt\Bundle\CryptBundle\Bridge\Rsa\RsaDecryptor" abstract="true">
             <argument /> <!-- Concrete zend rsa implementation -->
+            <argument /> <!-- Rsa padding -->
         </service>
 
     </services>
