@@ -50,6 +50,8 @@ class GttCryptExtension extends Extension
                 }
             }
         }
+
+        $this->loadDoctrineDbalConfiguration($container, $config['doctrine']['dbal']);
     }
 
     /**
@@ -193,5 +195,29 @@ class GttCryptExtension extends Extension
 
         $registryDefinition->addMethodCall('addEncryptor', [$name, new Reference($encryptorDefinitionId)]);
         $registryDefinition->addMethodCall('addDecryptor', [$name, new Reference($decryptorDefinitionId)]);
+    }
+
+    /**
+     * Loads doctrine settings
+     *
+     * @param ContainerBuilder $container Container
+     * @param array            $config    DBAL configuration section
+     *
+     * @return void
+     */
+    private function loadDoctrineDbalConfiguration(ContainerBuilder $container, array $config): void
+    {
+        $isEnabled = $config['encrypted_string']['enabled'];
+        $container->setParameter(
+            'gtt.crypt.param.doctrine.dbal.encrypted_string.enabled',
+            $isEnabled
+        );
+
+        $container->setParameter(
+            'gtt.crypt.param.doctrine.dbal.encrypted_string.cryptor',
+            $config['encrypted_string']['cryptor'] ?? null
+        );
+
+        $container->getDefinition('gtt.crypt.registry')->setPublic($isEnabled);
     }
 }

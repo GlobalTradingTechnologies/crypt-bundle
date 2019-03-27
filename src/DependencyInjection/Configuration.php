@@ -14,6 +14,9 @@ declare (strict_types=1);
 namespace Gtt\Bundle\CryptBundle\DependencyInjection;
 
 use Defuse\Crypto\Core as CryptoCore;
+use Doctrine\DBAL\Types\Type;
+use Gtt\Bundle\CryptBundle\Bridge\Doctrine\DBAL\Enum\TypeEnum;
+use RuntimeException;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -37,6 +40,37 @@ class Configuration implements ConfigurationInterface
             ->fixXmlConfig('cryptor')
             ->children()
                 ->append($this->createCryptorsNode())
+                ->append($this->createDoctrineNode())
+            ->end()
+            ->validate()
+                ->ifArray()
+                ->then(function (array $config): array {
+                    $cryptors = array_keys(($config['cryptors']['rsa'] ?? []) + ($config['cryptors']['aes'] ?? []));
+                    if ($config['doctrine']['dbal']['encrypted_string']['enabled']) {
+                        if (!class_exists(Type::class)) {
+                            throw new RuntimeException(
+                                sprintf(
+                                    "Doctrine DBAL is required for using \"%s\". Run the following command:\n".
+                                    "    composer require doctrine/dbal",
+                                    TypeEnum::ENCRYPTED_STRING
+                                )
+                            );
+                        }
+
+                        if (!\in_array($config['doctrine']['dbal']['encrypted_string']['cryptor'], $cryptors, true)) {
+                            throw new RuntimeException(
+                                sprintf(
+                                    'Can not use cryptor "%s" for "encrypted_string" since it is not defined. ' .
+                                    'Valid cryptors are: "%s".',
+                                    $config['doctrine']['dbal']['encrypted_string']['cryptor'],
+                                    implode('", "', $cryptors)
+                                )
+                            );
+                        }
+                    }
+
+                    return $config;
+                })
             ->end();
 
         return $treeBuilder;
@@ -52,7 +86,7 @@ class Configuration implements ConfigurationInterface
         $cryptorsNode = new ArrayNodeDefinition('cryptors');
         $cryptorsNode
             ->validate()
-                ->always(function($cryptors) {
+                ->always(static function($cryptors) {
                     // check that cryptor names are unique
                     if (!$cryptors) {
                         return [];
@@ -72,13 +106,8 @@ class Configuration implements ConfigurationInterface
                 })
             ->end();
 
-        if (class_exists(Rsa::class, true)) {
-            $cryptorsNode->append($this->createRsaNode());
-        }
-
-        if (class_exists(CryptoCore::class, true)) {
-            $cryptorsNode->append($this->createAesNode());
-        }
+        $cryptorsNode->append($this->createRsaNode());
+        $cryptorsNode->append($this->createAesNode());
 
         return $cryptorsNode;
     }
@@ -105,6 +134,15 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('padding')->defaultNull()->end()
                     ->scalarNode('binary_output')->defaultFalse()->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(static function (): bool {
+                    return !class_exists(Rsa::class);
+                })
+                ->thenInvalid(
+                    "The \"zendframework/zend-crypt\" is required for using RSA public key encryption. Run:\n" .
+                    "    composer require zendframework/zend-crypt"
+                )
             ->end();
         return $rsaNode;
     }
@@ -119,10 +157,8 @@ class Configuration implements ConfigurationInterface
         $aesNode = new ArrayNodeDefinition('aes');
         $aesNode
             ->info(sprintf(
-                'Symmetric encryption (%s and are authenticated with HMAC-%s). ' .
-                'Provided by and require the defuse/php-encryption package.',
-                strtoupper(CryptoCore::CIPHER_METHOD),
-                strtoupper(CryptoCore::HASH_FUNCTION_NAME)
+                'Symmetric encryption. ' .
+                'Provided by and require the defuse/php-encryption package.'
             ))
             ->useAttributeAsKey('name')
             ->prototype('array')
@@ -133,19 +169,23 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                     ->validate()
                         ->always()
-                        ->then(function ($keySize) {
-                            $expectedKeySize = CryptoCore::KEY_BYTE_SIZE * 8;
-                            if ($keySize !== $expectedKeySize) {
-                                throw new InvalidConfigurationException(
-                                    'Installed version of defuse/php-encryption package ' .
-                                    "provide only $expectedKeySize bits key size"
-                                );
+                        ->then(static function ($keySize) {
+                            if (class_exists(CryptoCore::class)) {
+                                $expectedKeySize = CryptoCore::KEY_BYTE_SIZE * 8;
+                                if ($keySize !== $expectedKeySize) {
+                                    throw new InvalidConfigurationException(
+                                        'Installed version of defuse/php-encryption package ' .
+                                        "provide only $expectedKeySize bits key size"
+                                    );
+                                }
                             }
+
+                            return $keySize;
                         })
                     ->end()
                 ->end()
                 ->scalarNode('key_path')
-                    ->info(sprintf('Path to a file that contains %d-bit key', CryptoCore::KEY_BYTE_SIZE * 8))
+                    ->info('Path to a file containing encryption key')
                     ->isRequired()
                 ->end()
                 ->booleanNode('binary_output')
@@ -153,7 +193,74 @@ class Configuration implements ConfigurationInterface
                     ->isRequired()
                     ->defaultFalse()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(static function (): bool {
+                    return !class_exists(CryptoCore::class);
+                })
+                ->thenInvalid(
+                    "The \"defuse/php-encryption\" is required for using AES encryption. Run:\n" .
+                    "    composer require defuse/php-encryption"
+                )
             ->end();
+
         return $aesNode;
+    }
+
+    /**
+     * Creates doctrine settings
+     *
+     * @return ArrayNodeDefinition
+     */
+    private function createDoctrineNode(): ArrayNodeDefinition
+    {
+        $result = new ArrayNodeDefinition('doctrine');
+        $result
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->arrayNode('dbal')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('encrypted_string')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('enabled')
+                                    ->defaultValue(false)
+                                    ->treatNullLike(false)
+                                    ->info(sprintf(
+                                        'Turn on/off "%s" type for doctrine entities.',
+                                        TypeEnum::ENCRYPTED_STRING
+                                    ))
+                                ->end()
+                                ->scalarNode('cryptor')
+                                    ->info('Cryptor name to use for encrypting database values.')
+                                ->end()
+                            ->end()
+                            ->beforeNormalization()
+                                ->ifTrue(static function ($value): bool {
+                                    return \is_bool($value);
+                                })
+                                ->then(static function (bool $value): array {
+                                    return ['enabled' => $value];
+                                })
+                            ->end()
+                            ->beforeNormalization()
+                                ->ifString()
+                                ->then(static function (string $value): array {
+                                    return ['enabled' => true, 'cryptor' => $value];
+                                })
+                            ->end()
+                            ->validate()
+                                ->ifTrue(static function ($config) {
+                                    return \is_array($config) && $config['enabled'] && empty($config['cryptor']);
+                                })
+                                ->thenInvalid('Cryptor name must be defined in order to use database value encryption.')
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $result;
     }
 }

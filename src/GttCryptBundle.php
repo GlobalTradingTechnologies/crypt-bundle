@@ -13,6 +13,9 @@ declare (strict_types=1);
 
 namespace Gtt\Bundle\CryptBundle;
 
+use Doctrine\DBAL\Types\Type;
+use Gtt\Bundle\CryptBundle\Bridge\Doctrine\DBAL\Enum\TypeEnum;
+use Gtt\Bundle\CryptBundle\Bridge\Doctrine\DBAL\Types\EncryptedStringType;
 use Gtt\Bundle\CryptBundle\DependencyInjection\Compiler\CryptorInjectorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -34,4 +37,21 @@ class GttCryptBundle extends Bundle
         $container->addCompilerPass(new CryptorInjectorPass());
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+        parent::boot();
+        if ($this->container->getParameter('gtt.crypt.param.doctrine.dbal.encrypted_string.enabled')) {
+            /** @var CryptorRegistry $cryptorRegistry */
+            $cryptorRegistry = $this->container->get('gtt.crypt.registry');
+
+            $cryptorName = $this->container->getParameter('gtt.crypt.param.doctrine.dbal.encrypted_string.cryptor');
+
+            Type::addType(TypeEnum::ENCRYPTED_STRING, EncryptedStringType::class);
+            EncryptedStringType::setEncryptor($cryptorRegistry->getEncryptor($cryptorName));
+            EncryptedStringType::setDecryptor($cryptorRegistry->getDecryptor($cryptorName));
+        }
+    }
 }
