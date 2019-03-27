@@ -14,6 +14,7 @@ use PHPUnit_Framework_TestCase as TestCase;
 use Gtt\Bundle\CryptBundle\DependencyInjection\GttCryptExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Crypto;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * "Integration-level" test: instead of use mocks it checks the original
@@ -178,7 +179,7 @@ class GttCryptExtensionTest extends TestCase
     public function testLoadWithInvalidConfiguration($expectedMessage, array $config)
     {
         $this->setExpectedException(
-            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+            InvalidConfigurationException::class,
             $expectedMessage
         );
         $this->load($config);

@@ -10,19 +10,20 @@
         }
     ],
     "require": {
-        "php": ">=5.5",
+        "php": ">=5.6",
         "symfony/framework-bundle": "^2.3|^3",
         "symfony/dependency-injection": "^2.3|^3",
         "symfony/console": "^2.3|^3"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0",
+        "phpunit/phpunit": "~5.7",
         "zendframework/zend-crypt": "^2.6",
         "defuse/php-encryption": "^2.2.1"
     },
     "suggest": {
         "zendframework/zend-crypt": "required in case when zend-crypt cryptographic component is used",
-        "defuse/php-encryption": "requires in case when symmetric cryptography is used"
+        "defuse/php-encryption": "requires in case when symmetric cryptography is used",
+        "ext-openssl": "requires in case when RSA cryptography is used"
     },
     "autoload": {
         "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "" }

@@ -12,13 +12,15 @@
 
 namespace Gtt\Bundle\CryptBundle\DependencyInjection\Compiler;
 
-use Gtt\Bundle\CryptBundle\DependencyInjection\GttCryptExtension;
 use Gtt\Bundle\CryptBundle\Exception\CryptorDefinitionNotFoundException;
 use Gtt\Bundle\CryptBundle\Exception\InvalidConsumerClassException;
 use Gtt\Bundle\CryptBundle\Exception\InvalidTagException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Gtt\Bundle\CryptBundle\Encryption\EncryptorAwareInterface;
+use Gtt\Bundle\CryptBundle\DependencyInjection\CryptorServiceIdGenerator;
+use Gtt\Bundle\CryptBundle\Encryption\DecryptorAwareInterface;
 
 /**
  * Injects encryptors and decryptors in tagged definitions
@@ -30,12 +32,12 @@ class CryptorInjectorPass implements CompilerPassInterface
     /**
      * Encryptor aware tag name
      */
-    const ENCRYPTOR_AWARE_TAG = "gtt.crypt.encryptor.aware";
+    const ENCRYPTOR_AWARE_TAG = 'gtt.crypt.encryptor.aware';
 
     /**
      * Decryptor aware tag name
      */
-    const DECRYPTOR_AWARE_TAG = "gtt.crypt.decryptor.aware";
+    const DECRYPTOR_AWARE_TAG = 'gtt.crypt.decryptor.aware';
 
     /**
      * Holds supported tag's metadata used to inject cryptors
@@ -44,14 +46,14 @@ class CryptorInjectorPass implements CompilerPassInterface
      */
     private static $tagConfig = array(
         self::ENCRYPTOR_AWARE_TAG => array(
-            'target_interface'     => 'Gtt\Bundle\CryptBundle\Encryption\EncryptorAwareInterface',
+            'target_interface'     => EncryptorAwareInterface::class,
             'setter'               => 'setEncryptor',
-            'service_id_generator' => array('Gtt\Bundle\CryptBundle\DependencyInjection\CryptorServiceIdGenerator', 'generateEncryptorId')
+            'service_id_generator' => array(CryptorServiceIdGenerator::class, 'generateEncryptorId')
         ),
         self::DECRYPTOR_AWARE_TAG => array(
-            'target_interface'     => 'Gtt\Bundle\CryptBundle\Encryption\DecryptorAwareInterface',
+            'target_interface'     => DecryptorAwareInterface::class,
             'setter'               => 'setDecryptor',
-            'service_id_generator' => array('Gtt\Bundle\CryptBundle\DependencyInjection\CryptorServiceIdGenerator', 'generateDecryptorId')
+            'service_id_generator' => array(CryptorServiceIdGenerator::class, 'generateDecryptorId')
         )
     );
 
@@ -70,7 +72,7 @@ class CryptorInjectorPass implements CompilerPassInterface
                     }
                     $name = $container->getParameterBag()->resolveValue($tag['cryptor_name']);
 
-                    $cryptorId = call_user_func_array($tagConfig['service_id_generator'], array($name));
+                    $cryptorId = call_user_func($tagConfig['service_id_generator'], $name);
                     if (!$container->hasDefinition($cryptorId)) {
                         throw new CryptorDefinitionNotFoundException($id, $name);
                     }

@@ -30,13 +30,22 @@ class RsaEncryptor implements EncryptorInterface
     private $zendRsa;
 
     /**
+     * OpenSSL encryption padding
+     *
+     * @var int
+     */
+    private $padding;
+
+    /**
      * RsaEncryptor constructor
      *
-     * @param ZendRsa $zendRsa Zend rsa implementation
+     * @param ZendRsa  $zendRsa Zend rsa implementation
+     * @param int|null $padding Padding
      */
-    public function __construct(ZendRsa $zendRsa)
+    public function __construct(ZendRsa $zendRsa, $padding = null)
     {
         $this->zendRsa = $zendRsa;
+        $this->padding = $padding;
     }
 
     /**
@@ -44,6 +53,6 @@ class RsaEncryptor implements EncryptorInterface
      */
     public function encrypt($value)
     {
-        return $this->zendRsa->encrypt($value);
+        return $this->zendRsa->encrypt($value, null, $this->padding);
     }
 }

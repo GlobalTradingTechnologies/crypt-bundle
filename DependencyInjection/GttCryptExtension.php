@@ -85,18 +85,30 @@ class GttCryptExtension extends Extension
     protected function registerRsaCryptor($name, $cryptorConfig, Definition $registryDefinition, ContainerBuilder $container)
     {
         $zendRsaDefinition = new DefinitionDecorator('gtt.crypt.rsa.zend_rsa');
+
+        /**
+         * We need this unset, cause Zends' RsaOptions doesn't support padding,
+         * but uses it to encrypt/decrypt with RSA.
+         */
+        $padding = $cryptorConfig['padding'];
+        unset($cryptorConfig['padding']);
+
         // add rsa options
         $zendRsaDefinition->replaceArgument(0, $cryptorConfig);
         $zendRsaDefinition->setPublic(false);
-        $zendRsaDefinitionId = "gtt.crypt.rsa.zend_rsa." . $name;
+        $zendRsaDefinitionId = "gtt.crypt.rsa.zend_rsa.{$name}";
         $container->setDefinition($zendRsaDefinitionId, $zendRsaDefinition);
         $zendRsaReference = new Reference($zendRsaDefinitionId);
 
         $rsaEncryptorDefinition = new DefinitionDecorator('gtt.crypt.rsa.encryptor');
         $rsaEncryptorDefinition->replaceArgument(0, $zendRsaReference);
+        $rsaEncryptorDefinition->replaceArgument(1, $padding);
+
 
         $rsaDecryptorDefinition = new DefinitionDecorator('gtt.crypt.rsa.decryptor');
         $rsaDecryptorDefinition->replaceArgument(0, $zendRsaReference);
+        $rsaDecryptorDefinition->replaceArgument(1, $padding);
+
 
         $this->setCryptorsPair(
             $name,
