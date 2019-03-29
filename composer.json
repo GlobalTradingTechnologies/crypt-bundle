@@ -17,6 +17,7 @@
         "symfony/config": "^4.1"
     },
     "require-dev": {
+        "doctrine/dbal": "^2.5",
         "phpunit/phpunit": "~7.0",
         "zendframework/zend-crypt": "^2.6",
         "defuse/php-encryption": "^2.2.1",
@@ -32,6 +33,9 @@
     },
     "autoload-dev": {
         "psr-4": { "Gtt\\Bundle\\CryptBundle\\": "tests/" }
+    },
+    "config": {
+        "sort-packages": true
     },
     "extra": {
         "branch-alias": {

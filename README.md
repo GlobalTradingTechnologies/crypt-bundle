@@ -80,7 +80,9 @@ Configuration
 =============
 Bundle configuration defines one or several cryptor-sections grouped by encryption-type (for now supported types are aes and rsa) and the name of the pair of encryptor and decryptor (_aes_binary_cryptor_, _aes_log_cryptor_ and _rsa_default_cryptor_ in example below).
 Each cryptor-section contains options for defining the pair of encryptor and decryptor of certain encryption type.
-You can see example that holds configs for 2 pairs of aes encryptor and decryptor and one pair of rsa encryptor and decryptor:
+Tou can turn on automatic encryption for database strings when using [doctrine/dbal](https://github.com/doctrine/dbal).
+You can see example that holds configs for 2 pairs of aes encryptor and decryptor and one pair of rsa encryptor and decryptor
+and uses *rsa_default_cryptor* for encrypting database values:
 ```yml
 gtt_crypt:
     cryptors:
@@ -99,6 +101,9 @@ gtt_crypt:
                 public_key: "/tmp/keys/rsa/pub.key"
                 binary_output: false
                 padding: 4
+    doctrine:
+        dbal:
+            encrypted_string: rsa_default_cryptor
 ```
 You can see reference of configuration options for supported encryption types:
 ### RSA
@@ -139,15 +144,30 @@ services:
         tags:
             - { name: gtt.crypt.decryptor.aware, cryptor_name: "aes_binary_cryptor" }
 ```
+
 ### Inject cryptors directly by service id
 Each encryptor or decryptor configured by CryptBundle is a service with id constructed in accordance with the following pattern:
 `gtt.crypt.encryptor.<name>` for encryptors and `gtt.crypt.decryptor.<name>`, where <name> holds corresponding cryptor name defined in bundle config.
 For example if you use configuration such as in [Configuration section](#Configuration) the <name> value can be one of _aes_binary_cryptor_, _aes_log_cryptor_ or _rsa_default_cryptor_.
 You can simply inject these services in DI-configs of your bundles.
+
 ### Use cryptor registry
 Crypt-bundle also registers [CryptorRegistry](https://github.com/GlobalTradingTechnologies/crypt-bundle/blob/master/CryptorRegistry.php) service with id _gtt.crypt.registry_ that collects all the encryptors and decryptors configured.
 You can use it to get cryptors by calling getEncryptor or getDecryptor methods with name of the encryptor or decryptor specified.
 For example if you use configuration such as in [Configuration section](#Configuration) the name can be one of _aes_binary_cryptor_, _aes_log_cryptor_ or _rsa_default_cryptor_.
+
+### Encrypting database values
+When database value encryption is enabled the `encrypted_string` dbal type is automatically registered. You can use this
+type inside doctrine entities or direct dbal queries.
+```php
+use Gtt\Bundle\CryptBundle\Bridge\Doctrine\DBAL\Enum\TypeEnum;
+
+$this->connection->executeQuery(
+    'INSERT INTO something VALUES(:my_secret)',
+    ['my_secret' => 'A very secret value'],
+    ['my_secret' => TypeEnum::ENCRYPTED_STRING]
+)
+```
 
 Supported encryption components
 ===============================

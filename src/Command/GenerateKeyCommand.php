@@ -9,14 +9,12 @@ declare (strict_types=1);
 
 namespace Gtt\Bundle\CryptBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Output\OutputInterface;
-
-use Defuse\Crypto\Core as CryptoCore;
-use Defuse\Crypto\Key as CryptoKey;
 use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
+use Defuse\Crypto\Key as CryptoKey;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use TypeError;
 
 /**
@@ -32,8 +30,16 @@ class GenerateKeyCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription(sprintf('Generate a random encryption key of %d bytes', CryptoCore::KEY_BYTE_SIZE))
+            ->setDescription('Generate a random encryption key')
             ->addArgument('filename', InputArgument::REQUIRED);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEnabled()
+    {
+        return parent::isEnabled() && class_exists(CryptoKey::class);
     }
 
     /**

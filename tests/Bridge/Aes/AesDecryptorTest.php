@@ -12,7 +12,6 @@ namespace Gtt\Bundle\CryptBundle\Bridge\Aes;
 use Defuse\Crypto\Key as CryptoKey;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
-use Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader;
 
 /**
  * Tests for symmetric decryptor
@@ -31,6 +30,10 @@ class AesDecryptorTest extends TestCase
      */
     protected function setUp()
     {
+        if (!class_exists(CryptoKey::class)) {
+            self::markTestSkipped('Package "defuse/php-encryption" is required to complete the test.');
+        }
+        
         $this->keyReader = $this->getMockBuilder(KeyReader::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -47,6 +50,10 @@ class AesDecryptorTest extends TestCase
      */
     public function provideDecrypt(): array
     {
+        if (!class_exists(CryptoKey::class)) {
+            return [];
+        }
+
         return [
             [false, Fixtures::ciphertext(), Fixtures::PLAIN_TEXT],
             [true, base64_decode(Fixtures::ciphertext()), Fixtures::PLAIN_TEXT],

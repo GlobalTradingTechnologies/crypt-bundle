@@ -12,7 +12,6 @@ namespace Gtt\Bundle\CryptBundle\Bridge\Aes;
 use Defuse\Crypto\Key as CryptoKey;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
-use Gtt\Bundle\CryptBundle\Bridge\Aes\KeyReader;
 
 /**
  * Encryptor tests
@@ -31,6 +30,10 @@ class AesEncryptorTest extends TestCase
      */
     protected function setUp()
     {
+        if (!class_exists(CryptoKey::class)) {
+            self::markTestSkipped('Package "defuse/php-encryption" is required to complete the test.');
+        }
+
         $this->keyReader = $this->getMockBuilder(KeyReader::class)
             ->disableOriginalConstructor()
             ->getMock();

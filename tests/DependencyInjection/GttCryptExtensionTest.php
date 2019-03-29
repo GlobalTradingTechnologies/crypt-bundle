@@ -11,10 +11,8 @@ namespace Gtt\Bundle\CryptBundle\DependencyInjection;
 
 use Gtt\Bundle\CryptBundle\Bridge\Aes\Fixtures;
 use PHPUnit\Framework\TestCase;
-use Gtt\Bundle\CryptBundle\DependencyInjection\GttCryptExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Crypto;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * "Integration-level" test: instead of use mocks it checks the original
@@ -71,6 +69,13 @@ class GttCryptExtensionTest extends TestCase
                     ],
                 ],
             ],
+            'doctrine' => [
+                'dbal' => [
+                    'encrypted_string' => [
+                        'enabled' => false
+                    ]
+                ]
+            ]
         ];
         $this->load($config, function (ContainerBuilder $container) use ($config) {
             foreach ($config['cryptors'] as $cryptorType) {
@@ -178,8 +183,36 @@ class GttCryptExtensionTest extends TestCase
      */
     public function testLoadWithInvalidConfiguration(string $expectedMessage, array $config): void
     {
-        $this->expectException(InvalidConfigurationException::class, $expectedMessage);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($expectedMessage);
         $this->load($config);
+    }
+
+    public function testEncryptedStringSetup(): void
+    {
+        $config = [
+            'cryptors' => ['rsa' => ['bar' => []]],
+            'doctrine' => [
+                'dbal' => [
+                    'encrypted_string' => [
+                        'enabled' => true,
+                        'cryptor' => 'bar'
+                    ]
+                ]
+            ]
+        ];
+
+        $this->load($config, function (ContainerBuilder $container) use ($config) {
+            self::assertTrue($container->getDefinition('gtt.crypt.registry')->isPublic());
+            self::assertTrue($container->hasParameter('gtt.crypt.param.doctrine.dbal.encrypted_string.enabled'));
+            self::assertTrue($container->hasParameter('gtt.crypt.param.doctrine.dbal.encrypted_string.cryptor'));
+
+            self::assertTrue($container->getParameter('gtt.crypt.param.doctrine.dbal.encrypted_string.enabled'));
+            self::assertSame(
+                $config['doctrine']['dbal']['encrypted_string']['cryptor'],
+                $container->getParameter('gtt.crypt.param.doctrine.dbal.encrypted_string.cryptor')
+            );
+        });
     }
 
     /**
