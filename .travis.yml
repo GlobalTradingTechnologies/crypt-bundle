@@ -10,6 +10,7 @@ matrix:
   - php: nightly
 
 before_script:
+  - echo "memory_limit=2G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - composer self-update
   - composer install
 

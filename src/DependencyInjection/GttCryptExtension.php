@@ -15,9 +15,9 @@ namespace Gtt\Bundle\CryptBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -95,6 +95,14 @@ class GttCryptExtension extends Extension
         ContainerBuilder $container
     ): void {
         $zendRsaDefinition = new ChildDefinition('gtt.crypt.rsa.zend_rsa');
+
+        /**
+         * We need this unset, cause Zends' RsaOptions doesn't support padding,
+         * but uses it to encrypt/decrypt with RSA.
+         */
+        $padding = $cryptorConfig['padding'];
+        unset($cryptorConfig['padding']);
+
         // add rsa options
         $zendRsaDefinition->replaceArgument(0, $cryptorConfig);
         $zendRsaDefinition->setPublic(false);
@@ -104,9 +112,13 @@ class GttCryptExtension extends Extension
 
         $rsaEncryptorDefinition = new ChildDefinition('gtt.crypt.rsa.encryptor');
         $rsaEncryptorDefinition->replaceArgument(0, $zendRsaReference);
+        $rsaEncryptorDefinition->replaceArgument(1, $padding);
+
 
         $rsaDecryptorDefinition = new ChildDefinition('gtt.crypt.rsa.decryptor');
         $rsaDecryptorDefinition->replaceArgument(0, $zendRsaReference);
+        $rsaDecryptorDefinition->replaceArgument(1, $padding);
+
 
         $this->setCryptorsPair(
             $name,

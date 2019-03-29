@@ -13,14 +13,12 @@ declare (strict_types=1);
 
 namespace Gtt\Bundle\CryptBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Defuse\Crypto\Core as CryptoCore;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zend\Crypt\PublicKey\Rsa;
-
-use Defuse\Crypto\Core as CryptoCore;
 
 /**
  * Bundle configuration
@@ -51,8 +49,7 @@ class Configuration implements ConfigurationInterface
      */
     private function createCryptorsNode(): ArrayNodeDefinition
     {
-        $builder = new TreeBuilder();
-        $cryptorsNode = $builder->root('cryptors');
+        $cryptorsNode = new ArrayNodeDefinition('cryptors');
         $cryptorsNode
             ->validate()
                 ->always(function($cryptors) {
@@ -93,8 +90,7 @@ class Configuration implements ConfigurationInterface
      */
     private function createRsaNode(): ArrayNodeDefinition
     {
-        $builder = new TreeBuilder();
-        $rsaNode = $builder->root('rsa');
+        $rsaNode = new ArrayNodeDefinition('rsa');
         $rsaNode
             ->info(
                 'Public-key (asymmetric) cryptosystem. ' .
@@ -106,6 +102,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('private_key')->end()
                     ->scalarNode('pass_phrase')->end()
                     ->scalarNode('public_key')->end()
+                    ->scalarNode('padding')->defaultNull()->end()
                     ->scalarNode('binary_output')->defaultFalse()->end()
                 ->end()
             ->end();
@@ -119,8 +116,7 @@ class Configuration implements ConfigurationInterface
      */
     private function createAesNode(): ArrayNodeDefinition
     {
-        $builder = new TreeBuilder();
-        $aesNode = $builder->root('aes');
+        $aesNode = new ArrayNodeDefinition('aes');
         $aesNode
             ->info(sprintf(
                 'Symmetric encryption (%s and are authenticated with HMAC-%s). ' .

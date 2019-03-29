@@ -91,7 +91,7 @@ class CryptorInjectorPassTest extends TestCase
         $container->setDefinition('aware', $cryptorAwareDefinition);
 
         // cryptor definition
-        $cryptorDefinition = new Definition("Class");
+        $cryptorDefinition = new Definition('Class');
         $container->setDefinition($cryptorDefinitionName, $cryptorDefinition);
 
         $this->compileContainer($container);
