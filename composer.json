@@ -21,7 +21,7 @@
         "phpunit/phpunit": "~7.0",
         "zendframework/zend-crypt": "^2.6",
         "defuse/php-encryption": "^2.2.1",
-        "mikey179/vfsStream": "^1.6"
+        "mikey179/vfsstream": "^1.6"
     },
     "suggest": {
         "zendframework/zend-crypt": "required in case when zend-crypt cryptographic component is used",
